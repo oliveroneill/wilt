@@ -158,6 +158,11 @@ function handleData(result) {
     // Convert timestamp to date
     played_at[artist].push(new Date(data[i].date * 1000));
   }
+  // Sort by most played
+  unique_artists.sort(function(a, b) {
+    return played_at[b].length - played_at[a].length;
+  });
+
   // Get the minimum date
   let startDate = new Date(data[0].date * 1000);
   draw(unique_artists, played_at, startDate);
