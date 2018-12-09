@@ -105,9 +105,10 @@
     }
 
     /**
-     * Render data based on plotly.
+     * Render data based on plotly. Period is passed in order to label
+     * the plot.
      */
-    function render(data) {
+    function render(data, period) {
       const plotDiv = document.getElementById('plot');
       var traces = [];
       var annotations = [];
@@ -154,8 +155,10 @@
         traces.push(trace);
       });
       const pruned = pruneAnnotations(annotations);
+      // Capitalise period to make it look good
+      const capitalised = period.charAt(0).toUpperCase() + period.slice(1);
       const layout = {
-        title: 'Artist Plays Per Week',
+        title: `Artist Plays Per ${capitalised}`,
         annotations: pruned
       };
       Plotly.newPlot(plotDiv, traces, layout);
@@ -182,7 +185,7 @@
           document.getElementById("plot").style.display = "block";
           document.getElementById("groupby").style.display = "block";
           // Render to a graph
-          render(json);
+          render(json, period);
         })
         .catch(function(error) {
           // Hide loading spinner
