@@ -3,32 +3,41 @@
 <html>
   <head>
     <title>Wilt Demo - What I Listen To</title>
+
+    <!-- Semantic imports -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
+
     <script src="https://cdn.plot.ly/plotly-1.42.5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
     <script type="text/javascript" src="constants.js"></script>
     <style>
-      .loader {
-        border: 8px solid #f3f3f3;
-        border-top: 8px solid #3498db;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-      }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+      .error {
+        display: none;
+        padding-left: 30px;
+        padding-right: 30px;
       }
     </style>
   </head>
   <body>
     <!-- Loading spinner -->
-    <div id="loading_spinner" style="width: 10%; padding-top: 20px; margin: 0 auto;">
-      <div class="loader" id="loader"></div>
+    <div id="loading">
+      <div class="ui active inverted dimmer">
+        <div class="ui text loader">Loading</div>
+      </div>
+      <p></p>
     </div>
+
     <!-- Error message -->
-    <div class="error" id="error" style="display: none">Sorry! Something went wrong :(</div>
+    <div id="error" class="error">
+      <div class="ui negative message">
+        <div class="header">
+          Sorry! Something wen't wrong.
+        </div>
+      </div>
+    </div>
+
     <!-- The plot -->
     <div id="plot" style="height: 700px; display: none"></div>
   </body>
@@ -124,7 +133,6 @@
         traces.push(trace);
       });
       const pruned = pruneAnnotations(annotations);
-      console.log(pruned);
       const layout = {
         title: 'Artist Plays Per Week',
         annotations: pruned
@@ -144,7 +152,7 @@
       })
       .then(function(json) {
         // Hide loading spinner
-        document.getElementById("loading_spinner").style.display = "none";
+        document.getElementById("loading").style.display = "none";
         // Display plot
         document.getElementById("plot").style.display = "block";
         // Render to a graph
@@ -152,7 +160,7 @@
       })
       .catch(function(error) {
         // Hide loading spinner
-        document.getElementById("loading_spinner").style.display = "none";
+        document.getElementById("loading").style.display = "none";
         // Display error
         document.getElementById("error").style.display = "block";
         console.error('Error:', error)
