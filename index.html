@@ -105,6 +105,8 @@
             {
               x: i,
               // Y value is offset because it looks better
+              // TODO: figure out how to position the annotations so that they
+              // don't overlap
               y: sums[i] - 5,
               // Custom value for us to keep track of the plays
               numberOfPlays: point.events[i],
@@ -143,6 +145,7 @@
     // Create the query
     const start = moment().subtract(3, 'month').unix();
     const end = moment().unix();
+    // TODO: drop down for week, month or day
     const query = `?user=${user}&start=${start}&end=${end}&group_by=week`;
     const url = `${backendURL}/playsPerArtist${query}`;
     // Make HTTP request to get data
