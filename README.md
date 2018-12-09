@@ -13,3 +13,10 @@ The current graph is a stacked area graph for artist plays per week for a
 specific user.
 
 ![My play history](screenshot.png)
+
+# TODO
+- Unit testing
+- Screenshot testing
+- Dates on the x-axis
+- Username input
+- Better annotation placement
