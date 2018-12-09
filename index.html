@@ -70,17 +70,17 @@
               <i class="dropdown icon"></i>
               <div class="menu">
                   <div class="header">Adjust time range</div>
-                  <div class="item" data-text="past two weeks" data-value="two_weeks">Past two weeks</div>
-                  <div class="active item" data-text="past three months" data-value="three_months">Past three months</div>
+                  <div class="item" data-text="past two weeks" data-value="two-weeks">Past two weeks</div>
+                  <div class="active item" data-text="past three months" data-value="three-months">Past three months</div>
                   <div class="item" data-text="past year" data-value="year">Past year</div>
                   <div class="item" data-text="custom" data-value="custom">Custom</div>
               </div>
             </div>
           </div>
 
-          <div id="start_form" class="field two fields" style="width: unset; display: none;">
+          <div id="start-form" class="field two fields" style="width: unset; display: none;">
             <div class="inline-with-date-picker">Start date</div>
-            <div class="ui calendar" style="padding-left:10px" id="rangestart">
+            <div class="ui calendar" style="padding-left:10px" id="range-start">
               <div class="ui input left icon">
                 <i class="calendar icon"></i>
                 <input type="text" placeholder="Start">
@@ -88,9 +88,9 @@
             </div>
           </div>
 
-          <div id="end_form" class="field two fields" style="width: unset; display: none;">
+          <div id="end-form" class="field two fields" style="width: unset; display: none;">
             <div class="inline-with-date-picker">End date</div>
-            <div class="ui calendar" style="padding-left:10px" id="rangeend">
+            <div class="ui calendar" style="padding-left:10px" id="range-end">
               <div class="ui input left icon">
                 <i class="calendar icon"></i>
                 <input type="text" placeholder="End">
@@ -266,23 +266,23 @@
     .dropdown({
       action: 'activate',
       onChange: function(text, value) {
-        document.getElementById("start_form").style.display = "none";
-        document.getElementById("end_form").style.display = "none";
+        document.getElementById("start-form").style.display = "none";
+        document.getElementById("end-form").style.display = "none";
 
         switch(text) {
           case 'custom':
             // For custom we just display the date picker
             // We need to use flex here so that all the form elements stay on the
             // same line
-            document.getElementById("start_form").style.display = "flex";
-            document.getElementById("end_form").style.display = "flex";
+            document.getElementById("start-form").style.display = "flex";
+            document.getElementById("end-form").style.display = "flex";
             // Don't re-do a query
             return;
-          case 'two_weeks':
+          case 'two-weeks':
             start = moment().subtract(2, 'week').unix();
             end = moment().unix();
             break;
-          case 'three_months':
+          case 'three-months':
             start = moment().subtract(3, 'month').unix();
             end = moment().unix();
             break;
@@ -297,17 +297,17 @@
     });
 
     // The date pickers
-    $('#rangestart').calendar({
+    $('#range-start').calendar({
       type: 'date',
-      endCalendar: $('#rangeend'),
+      endCalendar: $('#range-end'),
       onChange: function (date, text, mode) {
         // Don't query but set the start timestamp
         start = date.getTime() / 1000;
       }
     });
-    $('#rangeend').calendar({
+    $('#range-end').calendar({
       type: 'date',
-      startCalendar: $('#rangestart'),
+      startCalendar: $('#range-start'),
       onChange: function (date, text, mode) {
         // Query now that we've set the end timestamp
         end = date.getTime() / 1000;
