@@ -1,251 +1,161 @@
-
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>Wilt Demo - What I Listen To</title>
+<html>
+  <head>
+    <title>Wilt Demo - What I Listen To</title>
+    <script src="https://cdn.plot.ly/plotly-1.42.5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script type="text/javascript" src="constants.js"></script>
+    <style>
+      .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+      }
 
-<script type="text/javascript" src="constants.js"></script>
-
-<!-- Semantic imports -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
-
-<!-- Cubism styling -->
-<style>
-body {
-  font-family:Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
-  margin: 30px auto;
-  position: relative;
-}
-
-header {
-  padding: 6px 0;
-}
-
-.group {
-  margin-bottom: 1em;
-}
-
-.axis {
-  font: 10px sans-serif;
-  position: fixed;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.axis text {
-  -webkit-transition: fill-opacity 250ms linear;
-}
-
-.axis path {
-  display: none;
-}
-
-.axis line {
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.axis.top {
-  background-image: linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
-  background-image: -o-linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
-  background-image: -moz-linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
-  background-image: -webkit-linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
-  background-image: -ms-linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
-  top: 0px;
-  padding: 0 0 24px 0;
-}
-
-.axis.bottom {
-  background-image: linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
-  background-image: -o-linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
-  background-image: -moz-linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
-  background-image: -webkit-linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
-  background-image: -ms-linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
-  bottom: 0px;
-  padding: 24px 0 0 0;
-}
-
-.horizon {
-  border-bottom: solid 1px #000;
-  overflow: hidden;
-  position: relative;
-}
-
-.horizon {
-  border-top: solid 1px #000;
-  border-bottom: solid 1px #000;
-}
-
-.horizon + .horizon {
-  border-top: none;
-}
-
-.horizon canvas {
-  display: block;
-}
-
-.horizon .title,
-.horizon .value {
-  bottom: 0;
-  line-height: 30px;
-  margin: 0 6px;
-  position: absolute;
-  text-shadow: 0 1px 0 rgba(255,255,255,.5);
-  white-space: nowrap;
-}
-
-.horizon .title {
-  left: 0;
-}
-
-.horizon .value {
-  right: 0;
-}
-
-.horizon:hover {
-    background: #f9f9f9;
-}
-
-.line {
-  background: #000;
-  z-index: 2;
-}
-
-.error {
-  display: none;
-  padding-left: 30px;
-  padding-right: 30px;
-}
-</style>
-<body>
-
-<!-- Loading spinner -->
-<div id="loading">
-  <div class="ui active inverted dimmer">
-    <div class="ui text loader">Loading</div>
-  </div>
-  <p></p>
-</div>
-
-<!-- Error message -->
-<div id="error" class="error">
-  <div class="ui negative message">
-    <div class="header">
-      Sorry! Something wen't wrong.
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading spinner -->
+    <div id="loading_spinner" style="width: 10%; padding-top: 20px; margin: 0 auto;">
+      <div class="loader" id="loader"></div>
     </div>
-  </div>
-</div>
-
-<script src="http://d3js.org/d3.v2.min.js"></script>
-<script src="http://square.github.io/cubism/cubism.v1.min.js"></script>
-<script>
-
-function handleData(result) {
-  var data = result.data.history;
-  // Keep track of times each artist is played
-  var played_at = {};
-  // Keep track of artists
-  var unique_artists = [];
-  // Loop through play history and bucket the tracks by artists
-  for (var i = 0; i < data.length; i++) {
-    let artist = data[i].primaryArtist;
-    if (artist === undefined) continue;
-    if (!(artist in played_at)) {
-      played_at[artist] = [];
-      unique_artists.push(artist);
+    <!-- Error message -->
+    <div class="error" id="error" style="display: none">Sorry! Something went wrong :(</div>
+    <!-- The plot -->
+    <div id="plot" style="height: 700px; display: none"></div>
+  </body>
+  <script type="text/javascript">
+    /**
+     * Used to sort based on number of plays in reverse order.
+     */
+    function comparePlaysReverse(a,b) {
+      if (a.numberOfPlays < b.numberOfPlays)
+        return 1;
+      if (a.numberOfPlays > b.numberOfPlays)
+        return -1;
+      return 0;
     }
-    // Convert timestamp to date
-    played_at[artist].push(new Date(data[i].date * 1000));
-  }
-  // Sort by most played
-  unique_artists.sort(function(a, b) {
-    return played_at[b].length - played_at[a].length;
-  });
 
-  // Get the minimum date
-  let startDate = new Date(data[0].date * 1000);
-  draw(unique_artists, played_at, startDate);
-}
-
-function draw(rows, data, startDate) {
-  var context = cubism.context()
-      .stop();
-
-  // Calculate step size
-  var millisecondsSinceStart = new Date().getTime() - startDate.getTime();
-  var step = millisecondsSinceStart / context.size();
-
-  context.step(step);
-
-  // Remove loading spinner
-  document.getElementsByTagName('link')[0].disabled = true;
-  // Unload semantic UI since it messes with Cubism
-  document.getElementById("loading").style.display = "none";
-
-  d3.select("body").selectAll(".axis")
-      .data(["top", "bottom"])
-    .enter().append("div")
-      .attr("class", function(d) { return d + " axis"; })
-      .each(function(d) { d3.select(this).call(context.axis().ticks(12).orient(d)); });
-
-  d3.select("body").append("div")
-      .attr("class", "rule")
-      .call(context.rule());
-
-  d3.select("body").selectAll(".horizon")
-      .data(rows.map(play_history))
-    .enter().insert("div", ".bottom")
-      .attr("class", "horizon")
-    .call(context.horizon()
-      .format(function() {return "";}));
-
-  context.on("focus", function(i) {
-    d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
-  });
-
-  function play_history(name) {
-    return context.metric(function(start, stop, step, callback) {
-      rows = data[name];
-      // Filter dates out of the range
-      rows = rows
-        .filter(function(d) { return d > start && d < stop; })
-        .reverse();
-      // Buckets that make up the screen
-      var numBuckets = (+stop - +start) / step;
-      // Create an array where each element is a bucket
-      var values = Array.apply(null, Array(numBuckets)).map(Number.prototype.valueOf, 0);
-      // Increment the buckets based on the date
-      rows.forEach(function(d) {
-        var bucket = Math.round((+d - +start) / step);
-        values[bucket] += 1;
-
-        // It looks slightly better with some padding on either side
-        if (bucket > 0) values[bucket - 1] += 0.5;
-        if (bucket < values.length) values[bucket + 1] += 0.5;
+    /**
+     * Keep annotations to a minimum to avoid business on the screen.
+     * This will return a smaller set of annotations that should be displayed.
+     */
+    function pruneAnnotations(annotations) {
+      var values = []
+      annotations.forEach((group) => {
+        if (group.length == 0) return;
+        group.sort(comparePlaysReverse);
+        const mostPlayed = group[0];
+        if (mostPlayed.numberOfPlays == 0) return;
+        values.push(mostPlayed);
+        if (group.length <= 1) return;
+        for (var i = 1; i < 3 && i < group.length; i++) {
+          if (i < 2)
+            values.push(group[i]);
+          else if (mostPlayed.numberOfPlays - group[i].numberOfPlays < 10)
+            values.push(group[i]);
+        }
       });
-      callback(null, values);
-    }, name);
-  }
-}
+      return values;
+    }
 
-// GraphQL query
-var query = encodeURI(`{ history(userId: "`+user+`") { userId date primaryArtist name artists trackId } }`);
-let url = apiGatewayEndpoint + '?query=' + query;
+    /**
+     * Pick the font size for the annotations based on number of plays
+     */
+    function pickFontSize(numberOfPlays) {
+      if (numberOfPlays > 12) return 12;
+      if (numberOfPlays < 8) return 8;
+      return numberOfPlays;
+    }
 
-// Make request
-fetch(url, {
-  headers: {
-    'Accept': 'application/graphql',
-  }
-})
-.then(r => r.json())
-.then(handleData)
-.catch(function() {
-  // Remove loading spinner
-  document.getElementById("loading").style.display = "none";
-  // Show error
-  document.getElementById("error").style.display = "block";
-});
-</script>
-</body>
+    /**
+     * Render data based on plotly.
+     */
+    function render(data) {
+      const plotDiv = document.getElementById('plot');
+      var traces = [];
+      var annotations = [];
+      var sums = {}
+      data.forEach((point) => {
+        var xs = [];
+        var ys = [];
+        for (var i = 0; i < point.events.length; i++) {
+          xs.push(i);
+          ys.push(point.events[i]);
+          sums[i] = (sums[i] || 0) + point.events[i];
+          annotations[i] = annotations[i] || [];
+          annotations[i].push(
+            {
+              x: i,
+              // Y value is offset because it looks better
+              y: sums[i] - 5,
+              // Custom value for us to keep track of the plays
+              numberOfPlays: point.events[i],
+              text: point.primary_artist + ' (' + point.events[i] + ' plays)',
+              ax: 0,
+              ay: 0,
+              font: {size: pickFontSize(point.events[i])},
+            }
+          );
+        }
+        var trace = {
+          x: xs,
+          y: ys,
+          mode: 'markers',
+          name: point.primary_artist,
+          showlegend: false,
+          stackgroup: 'everything',
+          hoverinfo: 'text'
+        };
+        // The hover text for each point
+        var texts = ys.map((y) => {
+          if (y == 0) return '';
+          return point.primary_artist + ' (' + y + ' plays)';
+        });
+        trace['text'] = texts;
+        traces.push(trace);
+      });
+      const pruned = pruneAnnotations(annotations);
+      console.log(pruned);
+      const layout = {
+        title: 'Artist Plays Per Week',
+        annotations: pruned
+      };
+      Plotly.newPlot(plotDiv, traces, layout);
+    }
+
+    // Create the query
+    const start = moment().subtract(3, 'month').unix();
+    const end = moment().unix();
+    const query = `?user=${user}&start=${start}&end=${end}&group_by=week`;
+    const url = backendURL + `/playsPerArtist${query}`;
+    // Make HTTP request to get data
+    fetch(url)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(json) {
+        // Hide loading spinner
+        document.getElementById("loading_spinner").style.display = "none";
+        // Display plot
+        document.getElementById("plot").style.display = "block";
+        // Render to a graph
+        render(json);
+      })
+      .catch(function(error) {
+        // Hide loading spinner
+        document.getElementById("loading_spinner").style.display = "none";
+        // Display error
+        document.getElementById("error").style.display = "block";
+        console.error('Error:', error)
+      });
+  </script>
+</html>
