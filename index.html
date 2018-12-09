@@ -38,10 +38,29 @@
       </div>
     </div>
 
+    <h4 id="groupby" class="ui header" style="padding-left: 20px; display: none;">
+      <div class="content">
+        Group by
+        <div class="ui inline dropdown">
+          <div class="text">week</div>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <div class="header">Adjust time span</div>
+            <div class="item" data-text="day">Day</div>
+            <div class="active item" data-text="week">Week</div>
+            <div class="item" data-text="month">Month</div>
+          </div>
+        </div>
+      </div>
+    </h4>
+
     <!-- The plot -->
     <div id="plot" style="height: 700px; display: none"></div>
   </body>
   <script type="text/javascript">
+    // Semantic call needed for dropdown
+    $('.ui.dropdown').dropdown();
+
     /**
      * Used to sort based on number of plays in reverse order.
      */
@@ -142,31 +161,52 @@
       Plotly.newPlot(plotDiv, traces, layout);
     }
 
-    // Create the query
-    const start = moment().subtract(3, 'month').unix();
-    const end = moment().unix();
-    // TODO: drop down for week, month or day
-    const query = `?user=${user}&start=${start}&end=${end}&group_by=week`;
-    const url = `${backendURL}/playsPerArtist${query}`;
-    // Make HTTP request to get data
-    fetch(url)
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(json) {
-        // Hide loading spinner
-        document.getElementById("loading").style.display = "none";
-        // Display plot
-        document.getElementById("plot").style.display = "block";
-        // Render to a graph
-        render(json);
-      })
-      .catch(function(error) {
-        // Hide loading spinner
-        document.getElementById("loading").style.display = "none";
-        // Display error
-        document.getElementById("error").style.display = "block";
-        console.error('Error:', error)
-      });
+    /**
+     * Query database with period as 'week', 'month' or 'day'
+     */
+    function query(period) {
+      // Create the query
+      const start = moment().subtract(3, 'month').unix();
+      const end = moment().unix();
+      const query = `?user=${user}&start=${start}&end=${end}&group_by=${period}`;
+      const url = `${backendURL}/playsPerArtist${query}`;
+      // Make HTTP request to get data
+      fetch(url)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(json) {
+          // Hide loading spinner
+          document.getElementById("loading").style.display = "none";
+          // Display plot
+          document.getElementById("plot").style.display = "block";
+          document.getElementById("groupby").style.display = "block";
+          // Render to a graph
+          render(json);
+        })
+        .catch(function(error) {
+          // Hide loading spinner
+          document.getElementById("loading").style.display = "none";
+          // Display error
+          document.getElementById("error").style.display = "block";
+          console.error('Error:', error)
+        });
+    }
+
+    $('.dropdown')
+    .dropdown({
+      action: 'activate',
+      onChange: function(text, value) {
+        // Reset page back to loading screen
+        document.getElementById("groupby").style.display = "none";
+        document.getElementById("plot").style.display = "none";
+        document.getElementById("loading").style.display = "block";
+        // Query data with new interval
+        query(text);
+      }
+    });
+
+    // Start with week
+    query('week');
   </script>
 </html>
