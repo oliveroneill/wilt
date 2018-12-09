@@ -144,7 +144,7 @@
     const start = moment().subtract(3, 'month').unix();
     const end = moment().unix();
     const query = `?user=${user}&start=${start}&end=${end}&group_by=week`;
-    const url = backendURL + `/playsPerArtist${query}`;
+    const url = `${backendURL}/playsPerArtist${query}`;
     // Make HTTP request to get data
     fetch(url)
       .then(function(response) {
