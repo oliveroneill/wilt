@@ -2,6 +2,7 @@
 This is a browser client for displaying Wilt metrics.
 
 This will display a timeline of play history for the specified user.
+Inspired by [LastWave](https://github.com/taurheim/LastWave).
 
 # Installation
 Edit the `constants.js` file to specify the Google Cloud Functions backend and
