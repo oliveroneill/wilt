@@ -9,6 +9,10 @@
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
 
+    <!-- Semantic UI calendar extension -->
+    <script src="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/0.0.8/dist/calendar.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/0.0.8/dist/calendar.min.css"/>
+
     <script src="https://cdn.plot.ly/plotly-1.42.5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
     <script type="text/javascript" src="constants.js"></script>
@@ -17,6 +21,10 @@
         display: none;
         padding-left: 30px;
         padding-right: 30px;
+      }
+      /* To keep form element vertically centered with date pickers*/
+      .inline-with-date-picker {
+        padding-top: 7px;
       }
     </style>
   </head>
@@ -38,17 +46,56 @@
       </div>
     </div>
 
-    <h4 id="groupby" class="ui header" style="padding-left: 20px; display: none;">
-      <div class="content">
-        Group by
-        <div class="ui inline dropdown">
-          <div class="text">week</div>
-          <i class="dropdown icon"></i>
-          <div class="menu">
-            <div class="header">Adjust time span</div>
-            <div class="item" data-text="day">Day</div>
-            <div class="active item" data-text="week">Week</div>
-            <div class="item" data-text="month">Month</div>
+    <h4 id="query-form" class="ui header" style="padding-left: 20px; display: none;">
+      <div class="ui form">
+        <div class="three fields">
+          <div class="content inline-with-date-picker">
+            Group by
+            <div class="ui inline dropdown" id="groupby">
+              <div class="text">week</div>
+              <i class="dropdown icon"></i>
+              <div class="menu">
+                <div class="header">Adjust grouping</div>
+                <div class="item" data-text="day">Day</div>
+                <div class="active item" data-text="week">Week</div>
+                <div class="item" data-text="month">Month</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="content inline-with-date-picker">
+            over
+            <div class="ui inline dropdown" id="range">
+              <div class="text">past three months</div>
+              <i class="dropdown icon"></i>
+              <div class="menu">
+                  <div class="header">Adjust time range</div>
+                  <div class="item" data-text="past two weeks" data-value="two_weeks">Past two weeks</div>
+                  <div class="active item" data-text="past three months" data-value="three_months">Past three months</div>
+                  <div class="item" data-text="past year" data-value="year">Past year</div>
+                  <div class="item" data-text="custom" data-value="custom">Custom</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="start_form" class="field two fields" style="width: unset; display: none;">
+            <div class="inline-with-date-picker">Start date</div>
+            <div class="ui calendar" style="padding-left:10px" id="rangestart">
+              <div class="ui input left icon">
+                <i class="calendar icon"></i>
+                <input type="text" placeholder="Start">
+              </div>
+            </div>
+          </div>
+
+          <div id="end_form" class="field two fields" style="width: unset; display: none;">
+            <div class="inline-with-date-picker">End date</div>
+            <div class="ui calendar" style="padding-left:10px" id="rangeend">
+              <div class="ui input left icon">
+                <i class="calendar icon"></i>
+                <input type="text" placeholder="End">
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -167,10 +214,12 @@
     /**
      * Query database with period as 'week', 'month' or 'day'
      */
-    function query(period) {
+    function query(period, start, end) {
+      // Reset page back to loading screen
+      document.getElementById("query-form").style.display = "none";
+      document.getElementById("plot").style.display = "none";
+      document.getElementById("loading").style.display = "block";
       // Create the query
-      const start = moment().subtract(3, 'month').unix();
-      const end = moment().unix();
       const query = `?user=${user}&start=${start}&end=${end}&group_by=${period}`;
       const url = `${backendURL}/playsPerArtist${query}`;
       // Make HTTP request to get data
@@ -183,7 +232,7 @@
           document.getElementById("loading").style.display = "none";
           // Display plot
           document.getElementById("plot").style.display = "block";
-          document.getElementById("groupby").style.display = "block";
+          document.getElementById("query-form").style.display = "block";
           // Render to a graph
           render(json, period);
         })
@@ -196,20 +245,77 @@
         });
     }
 
-    $('.dropdown')
+    // Parameters that will be changed via UI
+    var start = moment().subtract(3, 'month').unix();
+    var end = moment().unix();
+    var groupby = "week";
+
+    // Group by form
+    $('#groupby')
     .dropdown({
       action: 'activate',
       onChange: function(text, value) {
-        // Reset page back to loading screen
-        document.getElementById("groupby").style.display = "none";
-        document.getElementById("plot").style.display = "none";
-        document.getElementById("loading").style.display = "block";
+        groupby = text;
         // Query data with new interval
-        query(text);
+        query(groupby, start, end);
       }
     });
 
-    // Start with week
-    query('week');
+    // Custom range dropdown
+    $('#range')
+    .dropdown({
+      action: 'activate',
+      onChange: function(text, value) {
+        document.getElementById("start_form").style.display = "none";
+        document.getElementById("end_form").style.display = "none";
+
+        switch(text) {
+          case 'custom':
+            // For custom we just display the date picker
+            // We need to use flex here so that all the form elements stay on the
+            // same line
+            document.getElementById("start_form").style.display = "flex";
+            document.getElementById("end_form").style.display = "flex";
+            // Don't re-do a query
+            return;
+          case 'two_weeks':
+            start = moment().subtract(2, 'week').unix();
+            end = moment().unix();
+            break;
+          case 'three_months':
+            start = moment().subtract(3, 'month').unix();
+            end = moment().unix();
+            break;
+          case 'year':
+            start = moment().subtract(1, 'year').unix();
+            end = moment().unix();
+            break;
+        }
+        // Query data with new interval
+        query(groupby, start, end);
+      }
+    });
+
+    // The date pickers
+    $('#rangestart').calendar({
+      type: 'date',
+      endCalendar: $('#rangeend'),
+      onChange: function (date, text, mode) {
+        // Don't query but set the start timestamp
+        start = date.getTime() / 1000;
+      }
+    });
+    $('#rangeend').calendar({
+      type: 'date',
+      startCalendar: $('#rangestart'),
+      onChange: function (date, text, mode) {
+        // Query now that we've set the end timestamp
+        end = date.getTime() / 1000;
+        query(groupby, start, end);
+      }
+    });
+
+    // Start the query when the page loads
+    query(groupby, start, end);
   </script>
 </html>
