@@ -204,6 +204,3 @@ $('#range-end').calendar({
     query(groupby, start, end);
   }
 });
-
-// Start the query when the page loads
-query(groupby, start, end);
