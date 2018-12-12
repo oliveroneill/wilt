@@ -10,7 +10,8 @@ username that you want to query on.
 
 ## Screenshot
 The current graph is a stacked area graph for artist plays per week for a
-specific user.
+specific user. Note: when you hover over points it will show *some*
+points, however it won't show all of them.
 
 ![My play history](screenshot.png)
 
@@ -20,3 +21,4 @@ specific user.
 - Dates on the x-axis
 - Username input
 - Better annotation placement
+- Fix hover labels not showing every point
