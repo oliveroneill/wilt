@@ -23,6 +23,7 @@ function pruneAnnotations(annotations) {
     values.push(mostPlayed);
     if (group.length <= 1) return;
     for (var i = 1; i < 3 && i < group.length; i++) {
+      if (group[i].numberOfPlays == 0) return;
       if (i < 2)
         values.push(group[i]);
       else if (mostPlayed.numberOfPlays - group[i].numberOfPlays < 10)
