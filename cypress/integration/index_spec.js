@@ -32,7 +32,7 @@ describe('Stacked Area Graph Test', () => {
           "primary_artist": "Bon Iver",
           "events": [0,0,0,0,0,0,0,0,0,0,0,0,3]
       }
-    ]
+    ];
     cy.route({
       method: 'GET',
       url: '**/playsPerArtist**',
@@ -41,6 +41,33 @@ describe('Stacked Area Graph Test', () => {
     cy.visit('index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
-    // TODO: snapshot test
+
+    // Ensure loading screen is hidden
+    cy.get('#loading').should((el) => {
+      expect(el).to.have.css('display', 'none');
+    });
+    // Ensure error screen is hidden
+    cy.get('#error').should((el) => {
+      expect(el).to.have.css('display', 'none');
+    });
+  });
+
+  it('Shows error', () => {
+    cy.route({
+      method: 'GET',
+      url: '**/playsPerArtist**',
+      status: 500,
+      response: "Bad response"
+    }).as('getData');
+    cy.visit('index.html');
+    // Wait until the request has been made
+    cy.wait(['@getData']);
+    cy.get('#error').should((el) => {
+      expect(el).to.have.css('display', 'block');
+    });
+    // Ensure error screen is hidden
+    cy.get('#loading').should((el) => {
+      expect(el).to.have.css('display', 'none');
+    });
   });
 });
