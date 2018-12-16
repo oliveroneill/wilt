@@ -4,7 +4,7 @@
   "description": "Area graph of artists captured by Wilt",
   "main": "index.js",
   "scripts": {
-    "test": "cypress run && node visualdiff.js",
+    "test": "rm -rf cypress/screenshots/ && cypress run && node check_visual_regressions.js",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
   },

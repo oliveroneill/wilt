@@ -1,2 +1,6 @@
 constants.json
 node_modules/
+# Visual regression things
+cypress/screenshots/
+screenshots_diff/
+cypress/videos/

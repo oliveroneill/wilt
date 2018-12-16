@@ -17,9 +17,7 @@ describe('Stacked Area Graph Test', () => {
       response: () => {}
     });
     cy.visit('index.html');
-    cy.get('#loading').should((el) => {
-      expect(el).to.have.css('display', 'block');
-    });
+    cy.screenshot()
   });
 
   it('Shows data', () => {
@@ -41,15 +39,7 @@ describe('Stacked Area Graph Test', () => {
     cy.visit('index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
-
-    // Ensure loading screen is hidden
-    cy.get('#loading').should((el) => {
-      expect(el).to.have.css('display', 'none');
-    });
-    // Ensure error screen is hidden
-    cy.get('#error').should((el) => {
-      expect(el).to.have.css('display', 'none');
-    });
+    cy.screenshot()
   });
 
   it('Shows error', () => {
@@ -62,12 +52,6 @@ describe('Stacked Area Graph Test', () => {
     cy.visit('index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
-    cy.get('#error').should((el) => {
-      expect(el).to.have.css('display', 'block');
-    });
-    // Ensure error screen is hidden
-    cy.get('#loading').should((el) => {
-      expect(el).to.have.css('display', 'none');
-    });
+    cy.screenshot()
   });
 });
