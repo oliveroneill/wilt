@@ -14,7 +14,7 @@ function comparePlaysReverse(a,b) {
  * This will return a smaller set of annotations that should be displayed.
  */
 function pruneAnnotations(annotations) {
-  var values = []
+  let values = []
   annotations.forEach((group) => {
     if (group.length == 0) return;
     group.sort(comparePlaysReverse);
@@ -22,7 +22,7 @@ function pruneAnnotations(annotations) {
     if (mostPlayed.numberOfPlays == 0) return;
     values.push(mostPlayed);
     if (group.length <= 1) return;
-    for (var i = 1; i < 3 && i < group.length; i++) {
+    for (let i = 1; i < 3 && i < group.length; i++) {
       if (group[i].numberOfPlays == 0) return;
       if (i < 2)
         values.push(group[i]);
@@ -48,13 +48,13 @@ function pickFontSize(numberOfPlays) {
  */
 function render(data, period) {
   const plotDiv = document.getElementById('plot');
-  var traces = [];
-  var annotations = [];
-  var sums = {}
+  let traces = [];
+  let annotations = [];
+  let sums = {}
   data.forEach((point) => {
-    var xs = [];
-    var ys = [];
-    for (var i = 0; i < point.events.length; i++) {
+    let xs = [];
+    let ys = [];
+    for (let i = 0; i < point.events.length; i++) {
       xs.push(i);
       ys.push(point.events[i]);
       sums[i] = (sums[i] || 0) + point.events[i];
@@ -75,7 +75,7 @@ function render(data, period) {
         }
       );
     }
-    var trace = {
+    let trace = {
       x: xs,
       y: ys,
       mode: 'markers',
@@ -85,7 +85,7 @@ function render(data, period) {
       hoverinfo: 'text'
     };
     // The hover text for each point
-    var texts = ys.map((y) => {
+    const texts = ys.map((y) => {
       if (y == 0) return '';
       return point.primary_artist + ' (' + y + ' plays)';
     });
@@ -137,9 +137,9 @@ function query(period, start, end) {
 }
 
 // Parameters that will be changed via UI
-var start = moment().subtract(3, 'month').unix();
-var end = moment().unix();
-var groupby = "week";
+let start = moment().subtract(3, 'month').unix();
+let end = moment().unix();
+let groupby = "week";
 
 // Group by form
 $('#groupby')
