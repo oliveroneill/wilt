@@ -17,7 +17,7 @@ describe('Stacked Area Graph Test', () => {
       response: () => {}
     });
     cy.visit('index.html');
-    cy.screenshot()
+    cy.matchScreenshot('Loading screen');
   });
 
   it('Shows data', () => {
@@ -39,7 +39,7 @@ describe('Stacked Area Graph Test', () => {
     cy.visit('index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
-    cy.screenshot()
+    cy.matchScreenshot('Shows data');
   });
 
   it('Shows error', () => {
@@ -52,6 +52,6 @@ describe('Stacked Area Graph Test', () => {
     cy.visit('index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
-    cy.screenshot()
+    cy.matchScreenshot('Error message');
   });
 });
