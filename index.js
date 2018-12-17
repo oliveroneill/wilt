@@ -54,7 +54,7 @@ function render(data, period) {
   data.forEach((point) => {
     let xs = [];
     let ys = [];
-    for (let i = 0; i < point.events.length; i++) {
+    for (let i in point.events) {
       xs.push(i);
       ys.push(point.events[i]);
       sums[i] = (sums[i] || 0) + point.events[i];
