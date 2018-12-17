@@ -18,7 +18,7 @@ screenshots.forEach((screenshot) => {
   const diff = new BlinkDiff({
     imageAPath: imageA,
     imageBPath: imageB,
-    imageOutputPath: output
+    imageOutputPath: output,
     thresholdType: BlinkDiff.THRESHOLD_PERCENT,
     // 1% threshold
     threshold: 0.01,
