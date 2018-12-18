@@ -6,6 +6,9 @@ Cypress.on("window:before:load", win => {
 
 describe('Stacked Area Graph Test', () => {
   beforeEach(() => {
+    // Fix date to test queries
+    const now = 1545079630000;
+    cy.clock(now);
     cy.server();
   });
 
@@ -21,9 +24,6 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Shows data', () => {
-    // Fix date to test queries
-    const now = 1545079630000;
-    cy.clock(now);
     const data = [
       {
           "primary_artist": "Tyler, The Creator",
@@ -44,6 +44,138 @@ describe('Stacked Area Graph Test', () => {
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchScreenshot('Shows data');
+  });
+
+  it('Queries past two weeks', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Ensure correct date is queried
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?user=*&start=${1543870030}&end=${1545079630}&group_by=week`,
+      response: []
+    }).as('getTwoWeeksData');
+    // Change to two weeks
+    cy.get('#range').click()
+    cy.contains('Past two weeks').click()
+    // Wait until the request has been made
+    cy.wait(['@getTwoWeeksData']);
+  });
+
+  it('Queries past year', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Ensure correct date is queried
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?user=*&start=${1513543630}&end=${1545079630}&group_by=week`,
+      response: []
+    }).as('getPastYearData');
+    // Change to two weeks
+    cy.get('#range').click()
+    cy.contains('Past year').click()
+    // Wait until the request has been made
+    cy.wait(['@getPastYearData']);
+  });
+
+  it('Queries past three months', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Ensure correct date is queried
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
+      response: []
+    }).as('getPastThreeMonths');
+    // Change to two weeks
+    cy.get('#range').click()
+    cy.contains('Past three months').click()
+    // Wait until the request has been made
+    cy.wait(['@getPastThreeMonths']);
+  });
+
+  it('Queries group by day', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Ensure correct date is queried
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=day`,
+      response: []
+    }).as('getGroupByDay');
+    // Change to two weeks
+    cy.get('#groupby').click()
+    cy.contains('Day').click()
+    // Wait until the request has been made
+    cy.wait(['@getGroupByDay']);
+  });
+
+  it('Queries group by month', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Ensure correct date is queried
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=month`,
+      response: []
+    }).as('getGroupByMonth');
+    // Change to two weeks
+    cy.get('#groupby').click()
+    cy.contains('Month').click()
+    // Wait until the request has been made
+    cy.wait(['@getGroupByMonth']);
+  });
+
+  it('Queries group by week', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Ensure correct date is queried
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
+      response: []
+    }).as('getGroupByWeek');
+    // Change to two weeks
+    cy.get('#groupby').click()
+    cy.contains('Week').click()
+    // Wait until the request has been made
+    cy.wait(['@getGroupByWeek']);
   });
 
   it('Shows error', () => {
