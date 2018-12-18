@@ -19,13 +19,18 @@ function pruneAnnotations(annotations) {
     if (group.length == 0) return;
     group.sort(comparePlaysReverse);
     const mostPlayed = group[0];
+    // Don't show anything if the most played is no plays
     if (mostPlayed.numberOfPlays == 0) return;
     values.push(mostPlayed);
+    // If there's only one artist then we're done
     if (group.length <= 1) return;
+    // Loop over at most 2 values to add as annotations
     for (let i = 1; i < 3 && i < group.length; i++) {
       if (group[i].numberOfPlays == 0) return;
       if (i < 2)
         values.push(group[i]);
+      // For the final annotation, we should only show it if it's close
+      // to the most played value (ie. within 10)
       else if (mostPlayed.numberOfPlays - group[i].numberOfPlays < 10)
         values.push(group[i]);
     }
