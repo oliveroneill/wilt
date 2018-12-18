@@ -21,6 +21,9 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Shows data', () => {
+    // Fix date to test queries
+    const now = 1545079630000;
+    cy.clock(now);
     const data = [
       {
           "primary_artist": "Tyler, The Creator",
@@ -33,7 +36,8 @@ describe('Stacked Area Graph Test', () => {
     ];
     cy.route({
       method: 'GET',
-      url: '**/playsPerArtist**',
+      // Ensure correct date is queried
+      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
       response: data
     }).as('getData');
     cy.visit('index.html');
