@@ -115,10 +115,10 @@ function query(period, start, end) {
   const url = `${apiGatewayEndpoint}/playsPerArtist${query}`;
   // Make HTTP request to get data
   fetch(url)
-    .then(function(response) {
+    .then((response) => {
       return response.json();
     })
-    .then(function(json) {
+    .then((json) => {
       // Hide loading spinner
       document.getElementById("loading").style.display = "none";
       // Display plot
@@ -127,7 +127,7 @@ function query(period, start, end) {
       // Render to a graph
       render(json, period);
     })
-    .catch(function(error) {
+    .catch((error) => {
       // Hide loading spinner
       document.getElementById("loading").style.display = "none";
       // Display error
@@ -149,7 +149,7 @@ function setupViews() {
   $('#groupby')
   .dropdown({
     action: 'activate',
-    onChange: function(text, value) {
+    onChange: (text, value) => {
       groupby = text;
       // Query data with new interval
       query(groupby, start, end);
@@ -160,7 +160,7 @@ function setupViews() {
   $('#range')
   .dropdown({
     action: 'activate',
-    onChange: function(text, value) {
+    onChange: (text, value) => {
       console.log("CHANGING", text, value);
       document.getElementById("start-form").style.display = "none";
       document.getElementById("end-form").style.display = "none";
@@ -196,7 +196,7 @@ function setupViews() {
   $('#range-start').calendar({
     type: 'date',
     endCalendar: $('#range-end'),
-    onChange: function (date, text, mode) {
+    onChange: (date, text, mode) => {
       // Don't query but set the start timestamp
       start = date.getTime() / 1000;
     }
@@ -204,7 +204,7 @@ function setupViews() {
   $('#range-end').calendar({
     type: 'date',
     startCalendar: $('#range-start'),
-    onChange: function (date, text, mode) {
+    onChange: (date, text, mode) => {
       // Query now that we've set the end timestamp
       end = date.getTime() / 1000;
       query(groupby, start, end);
