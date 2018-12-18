@@ -141,67 +141,70 @@ let start = moment().subtract(3, 'month').unix();
 let end = moment().unix();
 let groupby = "week";
 
-// Group by form
-$('#groupby')
-.dropdown({
-  action: 'activate',
-  onChange: function(text, value) {
-    groupby = text;
-    // Query data with new interval
-    query(groupby, start, end);
-  }
-});
-
-// Custom range dropdown
-$('#range')
-.dropdown({
-  action: 'activate',
-  onChange: function(text, value) {
-    document.getElementById("start-form").style.display = "none";
-    document.getElementById("end-form").style.display = "none";
-
-    switch(text) {
-      case 'custom':
-        // For custom we just display the date picker
-        // We need to use flex here so that all the form elements stay on the
-        // same line
-        document.getElementById("start-form").style.display = "flex";
-        document.getElementById("end-form").style.display = "flex";
-        // Don't re-do a query
-        return;
-      case 'two-weeks':
-        start = moment().subtract(2, 'week').unix();
-        end = moment().unix();
-        break;
-      case 'three-months':
-        start = moment().subtract(3, 'month').unix();
-        end = moment().unix();
-        break;
-      case 'year':
-        start = moment().subtract(1, 'year').unix();
-        end = moment().unix();
-        break;
+function setupViews() {
+  // Group by form
+  $('#groupby')
+  .dropdown({
+    action: 'activate',
+    onChange: function(text, value) {
+      groupby = text;
+      // Query data with new interval
+      query(groupby, start, end);
     }
-    // Query data with new interval
-    query(groupby, start, end);
-  }
-});
+  });
 
-// The date pickers
-$('#range-start').calendar({
-  type: 'date',
-  endCalendar: $('#range-end'),
-  onChange: function (date, text, mode) {
-    // Don't query but set the start timestamp
-    start = date.getTime() / 1000;
-  }
-});
-$('#range-end').calendar({
-  type: 'date',
-  startCalendar: $('#range-start'),
-  onChange: function (date, text, mode) {
-    // Query now that we've set the end timestamp
-    end = date.getTime() / 1000;
-    query(groupby, start, end);
-  }
-});
+  // Custom range dropdown
+  $('#range')
+  .dropdown({
+    action: 'activate',
+    onChange: function(text, value) {
+      console.log("CHANGING", text, value);
+      document.getElementById("start-form").style.display = "none";
+      document.getElementById("end-form").style.display = "none";
+
+      switch(text) {
+        case 'custom':
+          // For custom we just display the date picker
+          // We need to use flex here so that all the form elements stay on the
+          // same line
+          document.getElementById("start-form").style.display = "flex";
+          document.getElementById("end-form").style.display = "flex";
+          // Don't re-do a query
+          return;
+        case 'two-weeks':
+          start = moment().subtract(2, 'week').unix();
+          end = moment().unix();
+          break;
+        case 'three-months':
+          start = moment().subtract(3, 'month').unix();
+          end = moment().unix();
+          break;
+        case 'year':
+          start = moment().subtract(1, 'year').unix();
+          end = moment().unix();
+          break;
+      }
+      // Query data with new interval
+      query(groupby, start, end);
+    }
+  });
+
+  // The date pickers
+  $('#range-start').calendar({
+    type: 'date',
+    endCalendar: $('#range-end'),
+    onChange: function (date, text, mode) {
+      // Don't query but set the start timestamp
+      start = date.getTime() / 1000;
+    }
+  });
+  $('#range-end').calendar({
+    type: 'date',
+    startCalendar: $('#range-start'),
+    onChange: function (date, text, mode) {
+      // Query now that we've set the end timestamp
+      end = date.getTime() / 1000;
+      query(groupby, start, end);
+    }
+  });
+}
