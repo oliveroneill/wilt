@@ -62,8 +62,8 @@ describe('Stacked Area Graph Test', () => {
       response: []
     }).as('getTwoWeeksData');
     // Change to two weeks
-    cy.get('#range').click()
-    cy.contains('Past two weeks').click()
+    cy.get('#range').click();
+    cy.contains('Past two weeks').click();
     // Wait until the request has been made
     cy.wait(['@getTwoWeeksData']);
   });
@@ -84,8 +84,8 @@ describe('Stacked Area Graph Test', () => {
       response: []
     }).as('getPastYearData');
     // Change to two weeks
-    cy.get('#range').click()
-    cy.contains('Past year').click()
+    cy.get('#range').click();
+    cy.contains('Past year').click();
     // Wait until the request has been made
     cy.wait(['@getPastYearData']);
   });
@@ -106,7 +106,7 @@ describe('Stacked Area Graph Test', () => {
       response: []
     }).as('getPastThreeMonths');
     // Change to two weeks
-    cy.get('#range').click()
+    cy.get('#range').click();
     cy.contains('Past three months').click()
     // Wait until the request has been made
     cy.wait(['@getPastThreeMonths']);
@@ -128,8 +128,8 @@ describe('Stacked Area Graph Test', () => {
       response: []
     }).as('getGroupByDay');
     // Change to two weeks
-    cy.get('#groupby').click()
-    cy.contains('Day').click()
+    cy.get('#groupby').click();
+    cy.contains('Day').click();
     // Wait until the request has been made
     cy.wait(['@getGroupByDay']);
   });
@@ -150,8 +150,8 @@ describe('Stacked Area Graph Test', () => {
       response: []
     }).as('getGroupByMonth');
     // Change to two weeks
-    cy.get('#groupby').click()
-    cy.contains('Month').click()
+    cy.get('#groupby').click();
+    cy.contains('Month').click();
     // Wait until the request has been made
     cy.wait(['@getGroupByMonth']);
   });
@@ -172,8 +172,8 @@ describe('Stacked Area Graph Test', () => {
       response: []
     }).as('getGroupByWeek');
     // Change to two weeks
-    cy.get('#groupby').click()
-    cy.contains('Week').click()
+    cy.get('#groupby').click();
+    cy.contains('Week').click();
     // Wait until the request has been made
     cy.wait(['@getGroupByWeek']);
   });
@@ -194,11 +194,11 @@ describe('Stacked Area Graph Test', () => {
       response: []
     }).as('getCustomRange');
     // Change to two weeks
-    cy.get('#range').click()
-    cy.contains('Custom').click()
-    cy.get('#range-start').click()
-    cy.get('#range-start').contains('15').click()
-    cy.get('#range-end').contains('22').click()
+    cy.get('#range').click();
+    cy.contains('Custom').click();
+    cy.get('#range-start').click();
+    cy.get('#range-start').contains('15').click();
+    cy.get('#range-end').contains('22').click();
     // Wait until the request has been made
     cy.wait(['@getCustomRange']);
   });
