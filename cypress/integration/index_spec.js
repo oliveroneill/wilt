@@ -178,6 +178,31 @@ describe('Stacked Area Graph Test', () => {
     cy.wait(['@getGroupByWeek']);
   });
 
+  it('Queries custom range', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Ensure correct date is queried
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?user=*&start=${1544820420}&end=${1545425220}&group_by=week`,
+      response: []
+    }).as('getCustomRange');
+    // Change to two weeks
+    cy.get('#range').click()
+    cy.contains('Custom').click()
+    cy.get('#range-start').click()
+    cy.get('#range-start').contains('15').click()
+    cy.get('#range-end').contains('22').click()
+    // Wait until the request has been made
+    cy.wait(['@getCustomRange']);
+  });
+
   it('Shows error', () => {
     cy.route({
       method: 'GET',
