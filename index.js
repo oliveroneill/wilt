@@ -112,7 +112,7 @@ function query(period, start, end) {
   document.getElementById("loading").style.display = "block";
   // Create the query
   const query = `?user=${user}&start=${start}&end=${end}&group_by=${period}`;
-  const url = `${backendURL}/playsPerArtist${query}`;
+  const url = `${apiGatewayEndpoint}/playsPerArtist${query}`;
   // Make HTTP request to get data
   fetch(url)
     .then(function(response) {
