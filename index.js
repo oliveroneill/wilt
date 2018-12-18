@@ -141,6 +141,9 @@ let start = moment().subtract(3, 'month').unix();
 let end = moment().unix();
 let groupby = "week";
 
+/**
+ * Setup dropdown listeners
+ */
 function setupViews() {
   // Group by form
   $('#groupby')
