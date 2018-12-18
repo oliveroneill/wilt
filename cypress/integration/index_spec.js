@@ -46,6 +46,37 @@ describe('Stacked Area Graph Test', () => {
     cy.matchScreenshot('Shows data');
   });
 
+  it('Shows at most three annotations for each point', () => {
+    const data = [
+      {
+          "primary_artist": "Tyler, The Creator",
+          "events": [0,0,11,0,0,0,0,0,0,6,0,0,11]
+      },
+      {
+          "primary_artist": "Bon Iver",
+          "events": [0,0,2,0,0,0,0,0,0,0,0,3,2]
+      },
+      {
+          "primary_artist": "These New South Whales",
+          "events": [0,0,19,0,0,1,0,0,0,1,0,1,19]
+      },
+      {
+          "primary_artist": "Death Grips",
+          "events": [0,0,10,0,0,0,0,0,0,0,0,2,6]
+      }
+    ];
+    cy.route({
+      method: 'GET',
+      // Ensure correct date is queried
+      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
+      response: data
+    }).as('getData');
+    cy.visit('index.html');
+    // Wait until the request has been made
+    cy.wait(['@getData']);
+    cy.matchScreenshot('Shows at most three annotations for each point');
+  });
+
   it('Queries past two weeks', () => {
     cy.route({
       method: 'GET',
