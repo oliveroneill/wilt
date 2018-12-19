@@ -2,6 +2,9 @@
 // fallback to XHR. See https://github.com/cypress-io/cypress/issues/95
 Cypress.on("window:before:load", win => {
   win.fetch = null;
+  // Set constants values
+  win.user = 'bla';
+  win.apiGatewayEndpoint = 'https://pleasedontactuallygotothissite.com';
 });
 
 describe('Stacked Area Graph Test', () => {
