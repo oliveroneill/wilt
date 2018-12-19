@@ -5,8 +5,15 @@ This will display a timeline of play history for the specified user.
 Inspired by [LastWave](https://github.com/taurheim/LastWave).
 
 ## Installation
-Edit the `constants.js` file to specify the Google Cloud Functions backend and
+Create a `constants.js` file to specify the Google Cloud Functions backend and
 username that you want to query on.
+Format is:
+```javascript
+// User to query on
+const user = "<ENTER-USERNAME-HERE>";
+// Endpoint to make requests to
+const apiGatewayEndpoint = "<ENTER-BACKEND-URL-HERE>";
+```
 
 ## Testing
 ```bash
