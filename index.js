@@ -111,6 +111,7 @@ function render(data, period) {
  * Query database with period as 'week', 'month' or 'day'
  */
 function query(period, start, end) {
+  if (!checkConstants()) return;
   // Reset page back to loading screen
   document.getElementById("query-form").style.display = "none";
   document.getElementById("plot").style.display = "none";
@@ -145,6 +146,27 @@ function query(period, start, end) {
 let start = moment().subtract(3, 'month').unix();
 let end = moment().unix();
 let groupby = "week";
+
+function checkConstants() {
+  // Check that constants have been set up
+  try {
+      const x = user;
+      const y = apiGatewayEndpoint;
+  } catch (e) {
+      if (e instanceof ReferenceError) {
+        // Print something useful
+        console.error(
+          "Please create a constants.js file as specified in README.md"
+        );
+        // Hide loading spinner
+        document.getElementById("loading").style.display = "none";
+        // Display error
+        document.getElementById("error").style.display = "block";
+        return false;
+      }
+  }
+  return true;
+}
 
 /**
  * Setup dropdown listeners
