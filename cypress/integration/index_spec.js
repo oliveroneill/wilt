@@ -19,8 +19,9 @@ describe('Stacked Area Graph Test', () => {
     // Stub response and never return anything
     cy.route({
       method: 'GET',
-      url: '**/playsPerArtist**',
-      response: () => {}
+      url: '**/playsPerArtist?*',
+      response: [],
+      delay: 100000
     });
     cy.visit('index.html');
     cy.matchScreenshot('Loading screen');
@@ -215,7 +216,7 @@ describe('Stacked Area Graph Test', () => {
   it('Queries custom range', () => {
     cy.route({
       method: 'GET',
-      url: `**/playsPerArtist*`,
+      url: `**/playsPerArtist?*`,
       response: []
     }).as('getInitData');
     cy.visit('index.html');
@@ -240,7 +241,7 @@ describe('Stacked Area Graph Test', () => {
   it('Shows error', () => {
     cy.route({
       method: 'GET',
-      url: '**/playsPerArtist**',
+      url: '**/playsPerArtist?*',
       status: 500,
       response: "Bad response"
     }).as('getData');
