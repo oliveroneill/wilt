@@ -11,4 +11,4 @@ env:
 install:
   - npm ci
 script:
-  - "$(npm bin)/cypress run --record --key ${CYPRESS_RECORD_KEY}
+  - "$(npm bin)/cypress run --record --key ${CYPRESS_RECORD_KEY}"
