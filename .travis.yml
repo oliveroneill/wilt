@@ -1,4 +1,6 @@
 language: node_js
+before_script:
+  - export TZ=Australia/Sydney
 node_js:
   - 10
 cache:
