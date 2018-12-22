@@ -12,5 +12,8 @@ env:
     secure: Uwe/SgQfggx1exspPabF5bReaRBTfU+wv66FsVbcwzi5n/IUUJDQrwps74hW1Sxg2pitgbjgWovhasRsZ9Cj80b4wdRNUi8KxjiKuufr7OCsDQFK6BG6SeRjYBK63l5B6XbUuw+3KHfN2U6mXJOsrF/LZhVSy7mwbQylqpW/JLv6iQYW1YlIoLSyawrZn0m9lNH/hY+fLm8+nvG2Bl2bs4XJbSCqeN/C8SIg3HhGLlOd85DQ/0RjtnsI4tHmGOwBXyYxd4Ood5eGXoo/w2VZyJCNw29WdpJwbKXwQcVOL5TcHyeNuSLqN6/aDDJtcdvmwveMvXUmUA+cuiFex9LBGHzCqfHvJ34TDNx69Cej3p9b48x9z4knh03vHMkQFTA+Snnr6uBkt0J3uyjlV5r2tw8Osnxyefto2T3epW2mxKOOAQLSJA/efT9ySKXNTa/aXf1xY/V4g+cVQ7l7+4AmABB0H0ae3Df8fgHexDqNo5NIME21oe11mrn3BU6SlVfQDNoPGUVxg7gUF+MLyN4ZtwdBadTtOPeIopZoan8CAbRROLtRSVI8mJWJStEnAuVKfvPu6wFBnPyKyE63+APA7w3ONFYtn86D/doj3GKZX47/1QHWz3zZVEmg5llBw8Fxtnlm+Zy5KJWxguHTlj/adkm2B/XBs64yukgYYjYV7CI=
 install:
   - npm ci
+before_install:
+  - pip install --user tinys3
 script:
   - "$(npm bin)/cypress run --record --key ${CYPRESS_RECORD_KEY}"
+  - python upload_failures.py
