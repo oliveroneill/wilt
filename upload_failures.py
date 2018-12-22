@@ -28,5 +28,6 @@ if __name__ == '__main__':
                 f,
                 os.environ['UPLOAD_IOS_SNAPSHOT_BUCKET_NAME']
             )
+        print("Finished uploading.")
     else:
         print("No failures found")
