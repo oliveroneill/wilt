@@ -12,9 +12,9 @@ import tinys3
 
 if __name__ == '__main__':
     filename = 'wilt-failures_{}'.format(time.time())
-    failureDir = 'cypress/match-screenshots/diff'
+    failureDir = 'cypress/snapshots/index_spec.js/__diff_output__/'
     if os.path.isdir(failureDir) and len(os.listdir(failureDir)) > 0:
-        shutil.make_archive(filename, 'zip', 'cypress/match-screenshots/')
+        shutil.make_archive(filename, 'zip', failureDir)
         filename += '.zip'
 
         conn = tinys3.Connection(
