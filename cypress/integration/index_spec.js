@@ -5,6 +5,15 @@ Cypress.on("window:before:load", win => {
   // Set constants values
   win.user = 'bla';
   win.apiGatewayEndpoint = 'https://pleasedontactuallygotothissite.com';
+  // Disable scrollbar in tests since this breaks visual regression
+  var style = win.document.createElement('style');
+  var head = win.document.querySelector('head');
+  // This CSS disables scrollbars
+  var scrollBarStyle = win.document.createTextNode(
+    '::-webkit-scrollbar {display: none;}'
+  );
+  head.appendChild(style);
+  style.appendChild(scrollBarStyle);
 });
 
 describe('Stacked Area Graph Test', () => {
