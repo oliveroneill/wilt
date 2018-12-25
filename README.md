@@ -31,6 +31,9 @@ NOTE: tests the timezone is `Australia/Sydney`. This is a limitation of
 cypress, documented [here](https://github.com/cypress-io/cypress/issues/1043).
 Travis has been setup with this timezone.
 
+The base snapshots were run on macOS and don't lineup the same when compared to
+Linux. Potentially we should add different snapshots for each platform.
+
 ## Screenshot
 The current graph is a stacked area graph for artist plays per week for a
 specific user. Note: when you hover over points it will show *some*
