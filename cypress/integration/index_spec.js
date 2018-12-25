@@ -6,15 +6,22 @@ Cypress.on("window:before:load", win => {
   win.user = 'bla';
   win.apiGatewayEndpoint = 'https://pleasedontactuallygotothissite.com';
   // Disable scrollbar in tests since this breaks visual regression
-  var style = win.document.createElement('style');
-  var head = win.document.querySelector('head');
+  hideScrollbars(win);
+});
+
+/*
+ Use CSS to hide scrollbars. This only works for Chrome.
+ */
+function hideScrollbars(window) {
+  var style = window.document.createElement('style');
+  var head = window.document.querySelector('head');
   // This CSS disables scrollbars
-  var scrollBarStyle = win.document.createTextNode(
+  var scrollBarStyle = window.document.createTextNode(
     '::-webkit-scrollbar {display: none;}'
   );
   head.appendChild(style);
   style.appendChild(scrollBarStyle);
-});
+}
 
 describe('Stacked Area Graph Test', () => {
   beforeEach(() => {
