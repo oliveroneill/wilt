@@ -2,5 +2,4 @@ constants.js
 node_modules/
 cypress/screenshots/
 cypress/videos/
-cypress/match-screenshots/diff
-cypress/match-screenshots/new
+__diff_output__/

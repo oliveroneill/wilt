@@ -1,2 +1,3 @@
-import { register } from 'cypress-match-screenshot';
-register();
+import { addMatchImageSnapshotCommand } from 'cypress-image-snapshot/command';
+
+addMatchImageSnapshotCommand();

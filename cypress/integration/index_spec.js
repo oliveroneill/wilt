@@ -24,7 +24,7 @@ describe('Stacked Area Graph Test', () => {
       delay: 100000
     });
     cy.visit('index.html');
-    cy.matchScreenshot('Loading screen');
+    cy.matchImageSnapshot('Loading screen');
   });
 
   it('Shows data', () => {
@@ -47,7 +47,7 @@ describe('Stacked Area Graph Test', () => {
     cy.visit('index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
-    cy.matchScreenshot('Shows data');
+    cy.matchImageSnapshot('Shows data');
   });
 
   it('Shows at most three annotations for each point', () => {
@@ -78,7 +78,7 @@ describe('Stacked Area Graph Test', () => {
     cy.visit('index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
-    cy.matchScreenshot('Shows at most three annotations for each point');
+    cy.matchImageSnapshot('Shows at most three annotations for each point');
   });
 
   it('Queries past two weeks', () => {
@@ -248,6 +248,6 @@ describe('Stacked Area Graph Test', () => {
     cy.visit('index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
-    cy.matchScreenshot('Error message');
+    cy.matchImageSnapshot('Error message');
   });
 });
