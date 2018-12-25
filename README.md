@@ -1,4 +1,7 @@
 # Wilt - What I Listen To
+
+[![Build Status](https://travis-ci.org/oliveroneill/wilt-browser.svg?branch=master)](https://travis-ci.org/oliveroneill/wilt-browser)
+
 This is a browser client for displaying Wilt metrics.
 
 This will display a timeline of play history for the specified user.
