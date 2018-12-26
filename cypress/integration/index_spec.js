@@ -29,6 +29,7 @@ describe('Stacked Area Graph Test', () => {
     const now = 1545079630000;
     cy.clock(now);
     cy.server();
+    cy.viewport('macbook-15');
   });
 
   it('Shows loading screen', () => {
