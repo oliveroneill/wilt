@@ -150,20 +150,20 @@ let groupby = "week";
 function checkConstants() {
   // Check that constants have been set up
   try {
-      const x = user;
-      const y = apiGatewayEndpoint;
+    const x = user;
+    const y = apiGatewayEndpoint;
   } catch (e) {
-      if (e instanceof ReferenceError) {
-        // Print something useful
-        console.error(
-          "Please create a constants.js file as specified in README.md"
-        );
-        // Hide loading spinner
-        document.getElementById("loading").style.display = "none";
-        // Display error
-        document.getElementById("error").style.display = "block";
-        return false;
-      }
+    if (e instanceof ReferenceError) {
+      // Print something useful
+      console.error(
+        "Please create a constants.js file as specified in README.md"
+      );
+      // Hide loading spinner
+      document.getElementById("loading").style.display = "none";
+      // Display error
+      document.getElementById("error").style.display = "block";
+      return false;
+    }
   }
   return true;
 }
@@ -188,7 +188,6 @@ function setupViews() {
   .dropdown({
     action: 'activate',
     onChange: (text, value) => {
-      console.log("CHANGING", text, value);
       document.getElementById("start-form").style.display = "none";
       document.getElementById("end-form").style.display = "none";
 
