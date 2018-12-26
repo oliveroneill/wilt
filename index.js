@@ -60,13 +60,13 @@ function render(data, period) {
     let xs = [];
     let ys = [];
     for (let i in point.events) {
-      xs.push(i);
+      xs.push(point.dates[i]);
       ys.push(point.events[i]);
       sums[i] = (sums[i] || 0) + point.events[i];
       annotations[i] = annotations[i] || [];
       annotations[i].push(
         {
-          x: i,
+          x: point.dates[i],
           // Y value is offset because it looks better
           // TODO: figure out how to position the annotations so that they
           // don't overlap

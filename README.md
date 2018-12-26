@@ -42,7 +42,6 @@ points, however it won't show all of them.
 ![My play history](screenshot.png)
 
 ## TODO
-- Dates on the x-axis
 - Username input
 - Better annotation placement
 - Fix hover labels not showing every point
