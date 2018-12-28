@@ -1,3 +1,65 @@
+// Parameters that will be changed via UI
+let start = moment().subtract(3, 'month').unix();
+let end = moment().unix();
+let groupby = "week";
+
+/*
+ * To keep track of states that the UI can be in, call each
+ * function to switch state
+ */
+const uiStates = {
+  loading: () => {
+    // Hide plot stuff
+    document.getElementById("query-form").style.display = "none";
+    document.getElementById("plot").style.display = "none";
+    // Hide error
+    document.getElementById("error").style.display = "none";
+    // Display loading spinner
+    document.getElementById("loading").style.display = "block";
+  },
+  error: (error) => {
+    // Hide plot stuff
+    document.getElementById("query-form").style.display = "none";
+    document.getElementById("plot").style.display = "none";
+    // Hide loading spinner
+    document.getElementById("loading").style.display = "none";
+    // Display error
+    document.getElementById("error").style.display = "block";
+    console.error('Error:', error);
+  },
+  customRange: (enabled) => {
+    // Hide loading spinner
+    document.getElementById("loading").style.display = "none";
+    // Hide error
+    document.getElementById("error").style.display = "none";
+    // Display plot
+    document.getElementById("plot").style.display = "block";
+    document.getElementById("query-form").style.display = "block";
+    // Show custom range if enabled
+    if (enabled) {
+      // For custom we just display the date picker
+      // We need to use flex here so that all the form elements stay on the
+      // same line
+      document.getElementById("start-form").style.display = "flex";
+      document.getElementById("end-form").style.display = "flex";
+    } else {
+      document.getElementById("start-form").style.display = "none";
+      document.getElementById("end-form").style.display = "none";
+    }
+  },
+  graph: (data, period) => {
+    // Hide loading spinner
+    document.getElementById("loading").style.display = "none";
+    // Hide error
+    document.getElementById("error").style.display = "none";
+    // Display plot
+    document.getElementById("plot").style.display = "block";
+    document.getElementById("query-form").style.display = "block";
+    // Render to a graph
+    render(data, period);
+  },
+}
+
 /**
  * Used to sort based on number of plays in reverse order.
  */
@@ -55,7 +117,7 @@ function render(data, period) {
   const plotDiv = document.getElementById('plot');
   let traces = [];
   let annotations = [];
-  let sums = {}
+  let sums = {};
   data.forEach((point) => {
     let xs = [];
     let ys = [];
@@ -112,40 +174,23 @@ function render(data, period) {
  */
 function query(period, start, end) {
   if (!checkConstants()) return;
-  // Reset page back to loading screen
-  document.getElementById("query-form").style.display = "none";
-  document.getElementById("plot").style.display = "none";
-  document.getElementById("loading").style.display = "block";
   // Create the query
   const query = `?user=${user}&start=${start}&end=${end}&group_by=${period}`;
   const url = `${apiGatewayEndpoint}/playsPerArtist${query}`;
+  // Show loading screen
+  uiStates.loading();
   // Make HTTP request to get data
   fetch(url)
     .then((response) => {
       return response.json();
     })
     .then((json) => {
-      // Hide loading spinner
-      document.getElementById("loading").style.display = "none";
-      // Display plot
-      document.getElementById("plot").style.display = "block";
-      document.getElementById("query-form").style.display = "block";
-      // Render to a graph
-      render(json, period);
+      uiStates.graph(json, period);
     })
     .catch((error) => {
-      // Hide loading spinner
-      document.getElementById("loading").style.display = "none";
-      // Display error
-      document.getElementById("error").style.display = "block";
-      console.error('Error:', error)
+      uiStates.error(error);
     });
 }
-
-// Parameters that will be changed via UI
-let start = moment().subtract(3, 'month').unix();
-let end = moment().unix();
-let groupby = "week";
 
 function checkConstants() {
   // Check that constants have been set up
@@ -158,10 +203,7 @@ function checkConstants() {
       console.error(
         "Please create a constants.js file as specified in README.md"
       );
-      // Hide loading spinner
-      document.getElementById("loading").style.display = "none";
-      // Display error
-      document.getElementById("error").style.display = "block";
+      uiStates.error("Please create a constants.js file");
       return false;
     }
   }
@@ -188,16 +230,9 @@ function setupViews() {
   .dropdown({
     action: 'activate',
     onChange: (text, value) => {
-      document.getElementById("start-form").style.display = "none";
-      document.getElementById("end-form").style.display = "none";
-
       switch(text) {
         case 'custom':
-          // For custom we just display the date picker
-          // We need to use flex here so that all the form elements stay on the
-          // same line
-          document.getElementById("start-form").style.display = "flex";
-          document.getElementById("end-form").style.display = "flex";
+          uiStates.customRange(true);
           // Don't re-do a query
           return;
         case 'two-weeks':
@@ -213,6 +248,7 @@ function setupViews() {
           end = moment().unix();
           break;
       }
+      uiStates.customRange(false);
       // Query data with new interval
       query(groupby, start, end);
     }
