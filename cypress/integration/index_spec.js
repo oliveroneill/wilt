@@ -32,6 +32,9 @@ describe('Stacked Area Graph Test', () => {
     cy.viewport('macbook-15');
   });
 
+  /****************************************
+   SNAPSHOT TESTS
+  ****************************************/
   it('Shows loading screen', () => {
     // Stub response and never return anything
     cy.route({
@@ -44,12 +47,25 @@ describe('Stacked Area Graph Test', () => {
     cy.matchImageSnapshot('Loading screen');
   });
 
+  it('Shows error', () => {
+    cy.route({
+      method: 'GET',
+      url: '**/playsPerArtist?*',
+      status: 500,
+      response: "Bad response"
+    }).as('getData');
+    cy.visit('index.html');
+    // Wait until the request has been made
+    cy.wait(['@getData']);
+    cy.matchImageSnapshot('Error message');
+  });
+
   it('Shows data', () => {
     const data = [
       {
           "primary_artist": "Tyler, The Creator",
           "events": [0,0,1,0,0,0,0,0,0,0,6,0,0],
-          "dates":[
+          "dates": [
             "2018-09-26",
             "2018-10-03",
             "2018-10-10",
@@ -68,7 +84,7 @@ describe('Stacked Area Graph Test', () => {
       {
           "primary_artist": "Bon Iver",
           "events": [0,0,0,0,0,0,0,0,0,0,0,0,3],
-          "dates":[
+          "dates": [
             "2018-09-26",
             "2018-10-03",
             "2018-10-10",
@@ -102,7 +118,7 @@ describe('Stacked Area Graph Test', () => {
       {
           "primary_artist": "Tyler, The Creator",
           "events": [0,0,11,0,0,0,0,0,0,6,0,0,11],
-          "dates":[
+          "dates": [
             "2018-09-26",
             "2018-10-03",
             "2018-10-10",
@@ -121,7 +137,7 @@ describe('Stacked Area Graph Test', () => {
       {
           "primary_artist": "Bon Iver",
           "events": [0,0,2,0,0,0,0,0,0,0,0,3,2],
-          "dates":[
+          "dates": [
             "2018-09-26",
             "2018-10-03",
             "2018-10-10",
@@ -140,7 +156,7 @@ describe('Stacked Area Graph Test', () => {
       {
           "primary_artist": "These New South Whales",
           "events": [0,0,19,0,0,1,0,0,0,1,0,1,19],
-          "dates":[
+          "dates": [
             "2018-09-26",
             "2018-10-03",
             "2018-10-10",
@@ -159,7 +175,7 @@ describe('Stacked Area Graph Test', () => {
       {
           "primary_artist": "Death Grips",
           "events": [0,0,10,0,0,0,0,0,0,0,0,2,6],
-          "dates":[
+          "dates": [
             "2018-09-26",
             "2018-10-03",
             "2018-10-10",
@@ -187,6 +203,47 @@ describe('Stacked Area Graph Test', () => {
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Shows at most three annotations for each point');
   });
+
+  it('Shows custom range date pickers', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Change to two weeks
+    cy.get('#range').click();
+    cy.contains('Custom').click();
+    cy.matchImageSnapshot('Shows custom range date pickers');
+  });
+
+  it('Shows loading screen when group changes', () => {
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist*`,
+      response: []
+    }).as('getInitData');
+    cy.visit('index.html');
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    // Ensure correct date is queried
+    cy.route({
+      method: 'GET',
+      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=month`,
+      response: [],
+      delay: 100000
+    }).as('getGroupByMonth');
+    // Change to two weeks
+    cy.get('#groupby').click();
+    cy.contains('Month').click();
+    cy.matchImageSnapshot('Shows loading screen when group changes');
+  });
+
+  /****************************************
+   REQUEST TESTS
+  ****************************************/
 
   it('Queries past two weeks', () => {
     cy.route({
@@ -343,18 +400,5 @@ describe('Stacked Area Graph Test', () => {
     cy.get('#range-end').contains('22').click();
     // Wait until the request has been made
     cy.wait(['@getCustomRange']);
-  });
-
-  it('Shows error', () => {
-    cy.route({
-      method: 'GET',
-      url: '**/playsPerArtist?*',
-      status: 500,
-      response: "Bad response"
-    }).as('getData');
-    cy.visit('index.html');
-    // Wait until the request has been made
-    cy.wait(['@getData']);
-    cy.matchImageSnapshot('Error message');
   });
 });
