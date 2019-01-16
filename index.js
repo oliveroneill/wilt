@@ -12,6 +12,7 @@ const uiStates = {
     // Hide plot stuff
     document.getElementById("query-form").style.display = "none";
     document.getElementById("plot").style.display = "none";
+    document.getElementById("username").style.display = "none";
     // Hide error
     document.getElementById("error").style.display = "none";
     // Display loading spinner
@@ -21,6 +22,7 @@ const uiStates = {
     // Hide plot stuff
     document.getElementById("query-form").style.display = "none";
     document.getElementById("plot").style.display = "none";
+    document.getElementById("username").style.display = "none";
     // Hide loading spinner
     document.getElementById("loading").style.display = "none";
     // Display error
@@ -35,6 +37,7 @@ const uiStates = {
     // Display plot
     document.getElementById("plot").style.display = "block";
     document.getElementById("query-form").style.display = "block";
+    document.getElementById("username").style.display = "block";
     // Show custom range if enabled
     if (enabled) {
       // For custom we just display the date picker
@@ -55,6 +58,7 @@ const uiStates = {
     // Display plot
     document.getElementById("plot").style.display = "block";
     document.getElementById("query-form").style.display = "block";
+    document.getElementById("username").style.display = "block";
     // Render to a graph
     render(data, period);
   },
