@@ -1,5 +1,5 @@
 constants.js
 node_modules/
-cypress/screenshots/
-cypress/videos/
+test/e2e/screenshots/
+test/e2e/videos/
 __diff_output__/
