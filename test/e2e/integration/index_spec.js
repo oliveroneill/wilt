@@ -43,7 +43,7 @@ describe('Stacked Area Graph Test', () => {
       response: [],
       delay: 100000
     });
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     cy.matchImageSnapshot('Loading screen');
   });
 
@@ -54,7 +54,7 @@ describe('Stacked Area Graph Test', () => {
       status: 500,
       response: "Bad response"
     }).as('getData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Error message');
@@ -107,7 +107,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
       response: data
     }).as('getData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Shows data');
@@ -198,7 +198,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
       response: data
     }).as('getData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Shows at most three annotations for each point');
@@ -210,7 +210,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Change to two weeks
@@ -225,7 +225,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -251,7 +251,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -273,7 +273,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -295,7 +295,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -317,7 +317,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -339,7 +339,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -361,7 +361,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -383,7 +383,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?*`,
       response: []
     }).as('getInitData');
-    cy.visit('index.html');
+    cy.visit('public/index.html');
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
