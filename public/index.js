@@ -2,6 +2,7 @@
 let start = moment().subtract(3, 'month').unix();
 let end = moment().unix();
 let groupby = "week";
+let user = undefined;
 
 /*
  * To keep track of states that the UI can be in, call each
@@ -12,7 +13,7 @@ const uiStates = {
     // Hide plot stuff
     document.getElementById("query-form").style.display = "none";
     document.getElementById("plot").style.display = "none";
-    document.getElementById("username").style.display = "none";
+    document.getElementById("username-menu").style.display = "none";
     // Hide error
     document.getElementById("error").style.display = "none";
     // Display loading spinner
@@ -22,7 +23,7 @@ const uiStates = {
     // Hide plot stuff
     document.getElementById("query-form").style.display = "none";
     document.getElementById("plot").style.display = "none";
-    document.getElementById("username").style.display = "none";
+    document.getElementById("username-menu").style.display = "none";
     // Hide loading spinner
     document.getElementById("loading").style.display = "none";
     // Display error
@@ -37,7 +38,7 @@ const uiStates = {
     // Display plot
     document.getElementById("plot").style.display = "block";
     document.getElementById("query-form").style.display = "block";
-    document.getElementById("username").style.display = "block";
+    document.getElementById("username-menu").style.display = "block";
     // Show custom range if enabled
     if (enabled) {
       // For custom we just display the date picker
@@ -58,7 +59,7 @@ const uiStates = {
     // Display plot
     document.getElementById("plot").style.display = "block";
     document.getElementById("query-form").style.display = "block";
-    document.getElementById("username").style.display = "block";
+    document.getElementById("username-menu").style.display = "block";
     // Render to a graph
     render(data, period);
   },
@@ -178,6 +179,10 @@ function render(data, period) {
  */
 function query(period, start, end) {
   if (!checkConstants()) return;
+  if (user === undefined) {
+    uiStates.error("How are we querying without being logged in?");
+    return;
+  }
   // Create the query
   const query = `?user=${user}&start=${start}&end=${end}&group_by=${period}`;
   const url = `${apiGatewayEndpoint}/playsPerArtist${query}`;
@@ -199,8 +204,7 @@ function query(period, start, end) {
 function checkConstants() {
   // Check that constants have been set up
   try {
-    const x = user;
-    const y = apiGatewayEndpoint;
+    const x = apiGatewayEndpoint;
   } catch (e) {
     if (e instanceof ReferenceError) {
       // Print something useful
@@ -277,3 +281,35 @@ function setupViews() {
     }
   });
 }
+
+/*
+  Firebase Auth stuff
+*/
+
+function logout() {
+  firebase.auth().signOut().then(function() {
+    user = undefined;
+    // Just load... The page will redirect when firebase sends the
+    // onAuthStateChanged event
+    uiStates.loading();
+  }, function(error) {
+    uiStates.error(error);
+  });
+}
+
+// Initialise Firebase
+const app = firebase.initializeApp(firebaseConfig);
+firebase.auth().onAuthStateChanged(u => {
+  if (u) {
+    // Set global variable to uid
+    user = u.uid;
+    console.log("Authenticated:", user);
+    // TODO: I wish this was part of the ui states
+    document.getElementById('username').innerHTML = user;
+    // Start the query when the page loads
+    query(groupby, start, end);
+  } else {
+    user = undefined;
+    window.location.replace("/login");
+  }
+});

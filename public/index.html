@@ -18,6 +18,14 @@
 
     <script src="https://cdn.plot.ly/plotly-1.42.5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+
+    <!-- Firebase imports -->
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-functions.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.5.1/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.1/firebaseui.css" />
+
     <script type="text/javascript" src="constants.js"></script>
     <style>
       .error {
@@ -105,15 +113,15 @@
             </div>
           </div>
 
-          <span id="username" class="inline-with-date-picker align-right" style="display: none;">
+          <span id="username-menu" class="inline-with-date-picker align-right" style="display: none;">
             <div class="ui inline dropdown">
               <div class="text">
                 <i class="user icon"></i>
-                username_here
+                <div id="username">username_here</div>
               </div>
               <i class="dropdown icon"></i>
               <div class="menu">
-                <div class="item">
+                <div class="item" onclick="logout();">
                   Logout
                 </div>
               </div>
@@ -132,7 +140,5 @@
     $('.ui.dropdown').dropdown();
     // Setup dropdown listeners
     setupViews();
-    // Start the query when the page loads
-    query(groupby, start, end);
   </script>
 </html>

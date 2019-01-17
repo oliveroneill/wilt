@@ -1,5 +1,6 @@
-constants.js
+public/constants.js
 node_modules/
 test/e2e/screenshots/
 test/e2e/videos/
 __diff_output__/
+.firebase/
