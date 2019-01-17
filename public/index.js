@@ -63,6 +63,14 @@ const uiStates = {
     // Render to a graph
     render(data, period);
   },
+  loggedIn: (user) => {
+    document.getElementById('username').innerHTML = user;
+    // We shouldn't have loaded anything as we're just logging in
+    uiStates.loading();
+  },
+  loggedOut: () => {
+    window.location.replace("/login");
+  },
 }
 
 /**
@@ -205,6 +213,7 @@ function checkConstants() {
   // Check that constants have been set up
   try {
     const x = apiGatewayEndpoint;
+    const y = firebaseConfig;
   } catch (e) {
     if (e instanceof ReferenceError) {
       // Print something useful
@@ -297,19 +306,21 @@ function logout() {
   });
 }
 
-// Initialise Firebase
-const app = firebase.initializeApp(firebaseConfig);
-firebase.auth().onAuthStateChanged(u => {
-  if (u) {
-    // Set global variable to uid
-    user = u.uid;
-    console.log("Authenticated:", user);
-    // TODO: I wish this was part of the ui states
-    document.getElementById('username').innerHTML = user;
-    // Start the query when the page loads
-    query(groupby, start, end);
-  } else {
-    user = undefined;
-    window.location.replace("/login");
-  }
-});
+function setupFirebase() {
+  if (!checkConstants()) return;
+  // Initialise Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.auth().onAuthStateChanged(u => {
+    if (u) {
+      // Set global variable to uid
+      user = u.uid;
+      console.log("Authenticated:", user);
+      uiStates.loggedIn(user);
+      // Start the query when the page loads
+      query(groupby, start, end);
+    } else {
+      user = undefined;
+      uiStates.loggedOut();
+    }
+  });
+}
