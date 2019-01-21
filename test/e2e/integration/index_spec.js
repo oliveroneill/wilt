@@ -36,6 +36,11 @@ function hideScrollbars(window) {
 }
 
 describe('Stacked Area Graph Test', () => {
+  // Args passed into visit call to mock firebase
+  const visitArgs = {
+    onBeforeLoad: (win) => win.firebase = mockFirebase
+  };
+
   beforeEach(() => {
     // Fix date to test queries
     const now = 1545079630000;
@@ -55,12 +60,7 @@ describe('Stacked Area Graph Test', () => {
       response: [],
       delay: 100000
     });
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     cy.matchImageSnapshot('Loading screen');
   });
 
@@ -71,12 +71,7 @@ describe('Stacked Area Graph Test', () => {
       status: 500,
       response: "Bad response"
     }).as('getData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Error message');
@@ -129,12 +124,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
       response: data
     }).as('getData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Shows data');
@@ -225,12 +215,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
       response: data
     }).as('getData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Shows at most three annotations for each point');
@@ -242,12 +227,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Change to two weeks
@@ -262,12 +242,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -283,6 +258,34 @@ describe('Stacked Area Graph Test', () => {
     cy.matchImageSnapshot('Shows loading screen when group changes');
   });
 
+
+  it('Loads before login', () => {
+    // Stub response and never return anything
+    cy.route({
+      method: 'GET',
+      url: '**/playsPerArtist?*',
+      response: []
+    });
+    const blockingFirebase = {
+      initializeApp: () => {},
+      auth: () => {
+        return {
+          onAuthStateChanged: callback => {
+            // Don't call callback so it'll wait forever for auth
+          },
+          signOut: () => {}
+        }
+      }
+    };
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = blockingFirebase
+      }
+    );
+    cy.matchImageSnapshot('Loading screen before login');
+  });
+
   /****************************************
    REQUEST TESTS
   ****************************************/
@@ -293,12 +296,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -320,12 +318,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -347,12 +340,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -374,12 +362,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -401,12 +384,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -428,12 +406,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -455,12 +428,7 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?*`,
       response: []
     }).as('getInitData');
-    cy.visit(
-      'public/index.html',
-      {
-        onBeforeLoad: (win) => win.firebase = mockFirebase
-      }
-    );
+    cy.visit('public/index.html', visitArgs);
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -477,5 +445,71 @@ describe('Stacked Area Graph Test', () => {
     cy.get('#range-end').contains('22').click();
     // Wait until the request has been made
     cy.wait(['@getCustomRange']);
+  });
+
+  it('Redirects when not logged in', () => {
+    // Stub response and never return anything
+    cy.route({
+      method: 'GET',
+      url: '**/playsPerArtist?*',
+      response: []
+    });
+    const loggedOutFirebase = {
+      initializeApp: () => {},
+      auth: () => {
+        return {
+          onAuthStateChanged: callback => {
+            callback(null);
+          },
+          signOut: () => {}
+        }
+      }
+    };
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = loggedOutFirebase
+      }
+    );
+    cy.location('pathname').should('eq', '/public/login.html');
+  });
+
+  it('Calls signOut when pressing logout', () => {
+    // Stub response and never return anything
+    cy.route({
+      method: 'GET',
+      url: '**/playsPerArtist?*',
+      response: []
+    }).as('getInitData');
+    let signedOut = false;
+    const listeningFirebase = {
+      initializeApp: () => {},
+      auth: () => {
+        return {
+          onAuthStateChanged: callback => {
+            callback({uid: 'test_user'});
+          },
+          signOut: () => {
+            signedOut = true;
+            // Need promise to stop page from erroring
+            return new Promise((resolve, reject) => {});
+          }
+        }
+      }
+    };
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = listeningFirebase
+      }
+    );
+    // Wait for first request to finish
+    cy.wait(['@getInitData']);
+    cy.contains('test_user').click();
+    // Forcing the click was needed as it hangs over the graph and cypress
+    // complained
+    cy.contains('Logout').click({force: true}).should(() => {
+      expect(signedOut).to.be.true;
+    });
   });
 });

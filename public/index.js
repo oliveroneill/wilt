@@ -69,7 +69,7 @@ const uiStates = {
     uiStates.loading();
   },
   loggedOut: () => {
-    window.location.replace("/login");
+    window.location.replace("login.html");
   },
 }
 
