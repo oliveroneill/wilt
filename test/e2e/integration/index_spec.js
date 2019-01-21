@@ -1,10 +1,22 @@
-// Cypress doesn't currently support fetch, but we have a fetch polyfill to
-// fallback to XHR. See https://github.com/cypress-io/cypress/issues/95
+// Mock out firebase to login as 'test_user'
+// Firebase script imports are also blocked via blacklistHosts in cypress.json
+const mockFirebase = {
+  initializeApp: () => {},
+  auth: () => {
+    return {
+      onAuthStateChanged: callback => {
+        callback({uid: 'test_user'});
+      },
+      signOut: () => {}
+    }
+  }
+};
+
 Cypress.on("window:before:load", win => {
+  // Cypress doesn't currently support fetch, but we have a fetch polyfill to
+  // fallback to XHR. See https://github.com/cypress-io/cypress/issues/95
   win.fetch = null;
   // Set constants values
-  win.user = 'bla';
-  win.apiGatewayEndpoint = 'https://pleasedontactuallygotothissite.com';
   // Disable scrollbar in tests since this breaks visual regression
   hideScrollbars(win);
 });
@@ -43,7 +55,12 @@ describe('Stacked Area Graph Test', () => {
       response: [],
       delay: 100000
     });
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     cy.matchImageSnapshot('Loading screen');
   });
 
@@ -54,7 +71,12 @@ describe('Stacked Area Graph Test', () => {
       status: 500,
       response: "Bad response"
     }).as('getData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Error message');
@@ -107,7 +129,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
       response: data
     }).as('getData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Shows data');
@@ -198,7 +225,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
       response: data
     }).as('getData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait until the request has been made
     cy.wait(['@getData']);
     cy.matchImageSnapshot('Shows at most three annotations for each point');
@@ -210,7 +242,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Change to two weeks
@@ -225,7 +262,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -251,7 +293,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -273,7 +320,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -295,7 +347,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -317,7 +374,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -339,7 +401,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -361,7 +428,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
@@ -383,7 +455,12 @@ describe('Stacked Area Graph Test', () => {
       url: `**/playsPerArtist?*`,
       response: []
     }).as('getInitData');
-    cy.visit('public/index.html');
+    cy.visit(
+      'public/index.html',
+      {
+        onBeforeLoad: (win) => win.firebase = mockFirebase
+      }
+    );
     // Wait for first request to finish
     cy.wait(['@getInitData']);
     // Ensure correct date is queried
