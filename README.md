@@ -46,6 +46,5 @@ points, however it won't show all of them.
 ![My play history](screenshot.png)
 
 ## TODO
-- Username input
 - Better annotation placement
 - Fix hover labels not showing every point
