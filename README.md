@@ -12,10 +12,14 @@ Create a `constants.js` file to specify the Google Cloud Functions backend and
 username that you want to query on.
 Format is:
 ```javascript
-// User to query on
-const user = "<ENTER-USERNAME-HERE>";
 // Endpoint to make requests to
 const apiGatewayEndpoint = "<ENTER-BACKEND-URL-HERE>";
+// Firebase config
+const firebaseConfig = {
+  apiKey: "<ENTER-FIREBASE-API-KEY>",
+  authDomain: "<AUTH-DOMAIN>",
+  projectId: "<FIREBASE-PROJECT-ID>",
+};
 ```
 
 ## Testing
