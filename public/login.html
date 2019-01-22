@@ -72,9 +72,10 @@
         .then(result => {
           // Sign in with the token from the function
           const token = result.data.token;
-          return app.auth().signInWithCustomToken(token)
+          return app.auth().signInWithCustomToken(token);
         }).then(user => {
           console.log("Logged in:", user);
+          window.location.replace("index.html");
         }).catch(error => {
           console.error(error);
         });
