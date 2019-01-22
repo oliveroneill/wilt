@@ -19,6 +19,9 @@ Cypress.on("window:before:load", win => {
   // Set constants values
   // Disable scrollbar in tests since this breaks visual regression
   hideScrollbars(win);
+  // Set constants to values that won't do anything
+  win.firebaseConfig = {};
+  win.apiGatewayEndpoint = "http://pleasedontactuallyhitthisendpoint/";
 });
 
 /*
