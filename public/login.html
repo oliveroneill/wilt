@@ -1,3 +1,117 @@
 <html>
-<!-- TODO -->
+  <head>
+    <title>Wilt Login</title>
+
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-functions.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.5.1/firebaseui.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.1/firebaseui.css" />
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
+
+    <script type="text/javascript" src="constants.js"></script>
+
+    <style type="text/css">
+      body > .grid {
+        height: 100%;
+      }
+      .column {
+        max-width: 450px;
+      }
+    </style>
+  </head>
+  <script>
+    // Initialise Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    function login() {
+      function getLoginURL(scopes) {
+        return 'https://accounts.spotify.com/authorize?client_id=' + spotifyConfig.clientId +
+          '&redirect_uri=' + encodeURIComponent(spotifyConfig.redirectUri) +
+          '&scope=' + encodeURIComponent(scopes.join(' ')) +
+          '&response_type=token';
+      }
+      const url = getLoginURL([
+        'user-read-email'
+      ]);
+      return new Promise((resolve, reject) => {
+        window.addEventListener('message', event => {
+          const hash = JSON.parse(event.data);
+          if (hash.type == 'access_token') {
+            resolve(hash.access_token);
+          }
+        }, false);
+        // Show spotify auth popup
+        window.open(url, 'Spotify', 'height=600,width=400');
+      });
+    }
+
+    function getUserData(accessToken) {
+      return fetch(
+        'https://api.spotify.com/v1/me',
+        { 'headers': {'Authorization': 'Bearer ' + accessToken } }
+      );
+    }
+
+    function signIn() {
+      // Show loading text
+      document.getElementById('loading').style.display = "block";
+      // Hide login
+      document.getElementById('login-form').style.display = "none";
+      login()
+        .then(accessToken => getUserData(accessToken))
+        .then(response => response.json())
+        .then(data => {
+          // Call the signup function with the spotify id
+          const signUp = firebase.functions().httpsCallable('signUp');
+          return signUp({user_id: `spotify:${data.id}`});
+        })
+        .then(result => {
+          // Sign in with the token from the function
+          const token = result.data.token;
+          return app.auth().signInWithCustomToken(token)
+        }).then(user => {
+          console.log("Logged in:", user);
+        }).catch(error => {
+          console.error(error);
+        });
+    }
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        window.location.replace("index.html");
+      }
+    });
+  </script>
+  <body>
+    <!-- Loading spinner -->
+    <div id="loading" style="display:none;">
+      <div class="ui active inverted dimmer">
+        <div class="ui text loader">Loading</div>
+      </div>
+      <p></p>
+    </div>
+
+    <div id="login-form" class="ui middle aligned center aligned grid">
+      <div class="column">
+        <h2 class="ui blue image header">
+          <div class="content">
+            Wilt - What I Listen To
+          </div>
+        </h2>
+        <form class="ui large form">
+          <div class="ui stacked segment">
+            <div class="ui fluid large blue submit button" onclick="signIn();">
+              Login with Spotify
+            </div>
+          </div>
+
+          <div class="ui error message">
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
 </html>
