@@ -511,7 +511,7 @@ describe('Stacked Area Graph Test', () => {
     cy.contains('test_user').click();
     // Forcing the click was needed as it hangs over the graph and cypress
     // complained
-    cy.contains('Logout').click({force: true}).should(() => {
+    cy.contains('Logout').click().should(() => {
       expect(signedOut).to.be.true;
     });
   });
