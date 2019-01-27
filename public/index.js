@@ -192,17 +192,13 @@ function query(period, start, end) {
     return;
   }
   // Create the query
-  const query = `?user=${user}&start=${start}&end=${end}&group_by=${period}`;
-  const url = `${apiGatewayEndpoint}/playsPerArtist${query}`;
+  const playQuery = firebase.functions().httpsCallable('playsPerArtist');
   // Show loading screen
   uiStates.loading();
   // Make HTTP request to get data
-  fetch(url)
+  playQuery({start: start, end: end, group_by: period})
     .then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      uiStates.graph(json, period);
+      uiStates.graph(response.data, period);
     })
     .catch((error) => {
       uiStates.error(error);
@@ -296,7 +292,7 @@ function setupViews() {
 */
 
 function logout() {
-  firebase.auth().signOut().then(function() {
+  firebase.auth().signOut().then(() => {
     user = undefined;
     // Just load... The page will redirect when firebase sends the
     // onAuthStateChanged event

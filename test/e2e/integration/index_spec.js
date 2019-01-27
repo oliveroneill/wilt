@@ -1,17 +1,3 @@
-// Mock out firebase to login as 'test_user'
-// Firebase script imports are also blocked via blacklistHosts in cypress.json
-const mockFirebase = {
-  initializeApp: () => {},
-  auth: () => {
-    return {
-      onAuthStateChanged: callback => {
-        callback({uid: 'test_user'});
-      },
-      signOut: () => {}
-    }
-  }
-};
-
 Cypress.on("window:before:load", win => {
   // Cypress doesn't currently support fetch, but we have a fetch polyfill to
   // fallback to XHR. See https://github.com/cypress-io/cypress/issues/95
@@ -38,11 +24,38 @@ function hideScrollbars(window) {
   style.appendChild(scrollBarStyle);
 }
 
-describe('Stacked Area Graph Test', () => {
-  // Args passed into visit call to mock firebase
-  const visitArgs = {
-    onBeforeLoad: (win) => win.firebase = mockFirebase
+function mockFirebaseSignIn() {
+
+}
+
+function mockFirebaseFunction(promise) {
+  const mockFunctions = {
+    call: () => {}
   };
+  const mockFirebase = {
+    initializeApp: () => {},
+    auth: () => {
+      return {
+        onAuthStateChanged: callback => {
+          callback({uid: 'test_user'});
+        },
+        signOut: () => {}
+      }
+    },
+    functions: () => {
+      return {
+        httpsCallable: (name) => mockFunctions.call
+      }
+    }
+  };
+  cy.stub(mockFunctions, 'call', (args) => {
+    console.log(args);
+    return promise;
+  });
+  return mockFirebase;
+}
+
+describe('Stacked Area Graph Test', () => {
 
   beforeEach(() => {
     // Fix date to test queries
@@ -56,27 +69,28 @@ describe('Stacked Area Graph Test', () => {
    SNAPSHOT TESTS
   ****************************************/
   it('Shows loading screen', () => {
-    // Stub response and never return anything
-    cy.route({
-      method: 'GET',
-      url: '**/playsPerArtist?*',
-      response: [],
-      delay: 100000
-    });
+    // Args passed into visit call to mock firebase
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = mockFirebaseFunction(
+          new Promise((resolve, reject) => {})
+        );
+      }
+    };
     cy.visit('public/index.html', visitArgs);
     cy.matchImageSnapshot('Loading screen');
   });
 
   it('Shows error', () => {
-    cy.route({
-      method: 'GET',
-      url: '**/playsPerArtist?*',
-      status: 500,
-      response: "Bad response"
-    }).as('getData');
+    // Args passed into visit call to mock firebase
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = mockFirebaseFunction(
+          Promise.reject(new Error('testing'))
+        );
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait until the request has been made
-    cy.wait(['@getData']);
     cy.matchImageSnapshot('Error message');
   });
 
@@ -121,15 +135,17 @@ describe('Stacked Area Graph Test', () => {
           ]
       }
     ];
-    cy.route({
-      method: 'GET',
-      // Ensure correct date is queried
-      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
-      response: data
-    }).as('getData');
-    cy.visit('public/index.html', visitArgs);
-    // Wait until the request has been made
-    cy.wait(['@getData']);
+    const firebase = mockFirebaseFunction(Promise.resolve({data: data}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
+    cy.visit('public/index.html', visitArgs).then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1537220830, end: 1545079630, group_by: 'week'}
+      );
+    });
     cy.matchImageSnapshot('Shows data');
   });
 
@@ -212,27 +228,28 @@ describe('Stacked Area Graph Test', () => {
           ]
       }
     ];
-    cy.route({
-      method: 'GET',
-      // Ensure correct date is queried
-      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
-      response: data
-    }).as('getData');
-    cy.visit('public/index.html', visitArgs);
-    // Wait until the request has been made
-    cy.wait(['@getData']);
+    const firebase = mockFirebaseFunction(Promise.resolve({data: data}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
+    cy.visit('public/index.html', visitArgs).then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1537220830, end: 1545079630, group_by: 'week'}
+      );
+    });
     cy.matchImageSnapshot('Shows at most three annotations for each point');
   });
 
   it('Shows custom range date pickers', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
     // Change to two weeks
     cy.get('#range').click();
     cy.contains('Custom').click();
@@ -240,35 +257,27 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Shows loading screen when group changes', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    firebase.functions().httpsCallable().onCall(1).returns(
+      new Promise((resolve, reject) => {})
+    );
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
-    // Ensure correct date is queried
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=month`,
-      response: [],
-      delay: 100000
-    }).as('getGroupByMonth');
     // Change to two weeks
     cy.get('#groupby').click();
-    cy.contains('Month').click();
+    cy.contains('Month').click().then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1537220830, end: 1545079630, group_by: 'month'}
+      );
+    });
     cy.matchImageSnapshot('Shows loading screen when group changes');
   });
 
-
   it('Loads before login', () => {
-    // Stub response and never return anything
-    cy.route({
-      method: 'GET',
-      url: '**/playsPerArtist?*',
-      response: []
-    });
     const blockingFirebase = {
       initializeApp: () => {},
       auth: () => {
@@ -294,169 +303,128 @@ describe('Stacked Area Graph Test', () => {
   ****************************************/
 
   it('Queries past two weeks', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
-    // Ensure correct date is queried
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?user=*&start=${1543870030}&end=${1545079630}&group_by=week`,
-      response: []
-    }).as('getTwoWeeksData');
     // Change to two weeks
     cy.get('#range').click();
-    cy.contains('Past two weeks').click();
-    // Wait until the request has been made
-    cy.wait(['@getTwoWeeksData']);
+    cy.contains('Past two weeks').click().then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1543870030, end: 1545079630, group_by: 'week'}
+      );
+    });
   });
 
   it('Queries past year', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
-    // Ensure correct date is queried
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?user=*&start=${1513543630}&end=${1545079630}&group_by=week`,
-      response: []
-    }).as('getPastYearData');
     // Change to two weeks
     cy.get('#range').click();
-    cy.contains('Past year').click();
-    // Wait until the request has been made
-    cy.wait(['@getPastYearData']);
+    cy.contains('Past year').click().then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1513543630, end: 1545079630, group_by: 'week'}
+      );
+    });
   });
 
   it('Queries past three months', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
-    // Ensure correct date is queried
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
-      response: []
-    }).as('getPastThreeMonths');
     // Change to two weeks
     cy.get('#range').click();
-    cy.contains('Past three months').click()
-    // Wait until the request has been made
-    cy.wait(['@getPastThreeMonths']);
+    cy.contains('Past three months').click().then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1537220830, end: 1545079630, group_by: 'week'}
+      );
+    });
   });
 
   it('Queries group by day', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
-    // Ensure correct date is queried
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=day`,
-      response: []
-    }).as('getGroupByDay');
     // Change to two weeks
     cy.get('#groupby').click();
-    cy.contains('Day').click();
-    // Wait until the request has been made
-    cy.wait(['@getGroupByDay']);
+    cy.contains('Day').click().then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1537220830, end: 1545079630, group_by: 'day'}
+      );
+    });
   });
 
   it('Queries group by month', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
-    // Ensure correct date is queried
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=month`,
-      response: []
-    }).as('getGroupByMonth');
     // Change to two weeks
     cy.get('#groupby').click();
-    cy.contains('Month').click();
-    // Wait until the request has been made
-    cy.wait(['@getGroupByMonth']);
+    cy.contains('Month').click().then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1537220830, end: 1545079630, group_by: 'month'}
+      );
+    });
   });
 
   it('Queries group by week', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
-    // Ensure correct date is queried
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?user=*&start=${1537220830}&end=${1545079630}&group_by=week`,
-      response: []
-    }).as('getGroupByWeek');
     // Change to two weeks
     cy.get('#groupby').click();
-    cy.contains('Week').click();
-    // Wait until the request has been made
-    cy.wait(['@getGroupByWeek']);
+    cy.contains('Week').click().then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1537220830, end: 1545079630, group_by: 'week'}
+      );
+    });
   });
 
   it('Queries custom range', () => {
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?*`,
-      response: []
-    }).as('getInitData');
+    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    const visitArgs = {
+      onBeforeLoad: (win) => {
+        win.firebase = firebase;
+      }
+    };
     cy.visit('public/index.html', visitArgs);
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
-    // Ensure correct date is queried
-    cy.route({
-      method: 'GET',
-      url: `**/playsPerArtist?user=*&start=${1544820420}&end=${1545425220}&group_by=week`,
-      response: []
-    }).as('getCustomRange');
     // Change to two weeks
     cy.get('#range').click();
     cy.contains('Custom').click();
     cy.get('#range-start').click();
     cy.get('#range-start').contains('15').click();
-    cy.get('#range-end').contains('22').click();
-    // Wait until the request has been made
-    cy.wait(['@getCustomRange']);
+    cy.get('#range-end').contains('22').click().then(() => {
+      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+        {start: 1544820420, end: 1545425220, group_by: 'week'}
+      );
+    });
   });
 
   it('Redirects when not logged in', () => {
-    // Stub response and never return anything
-    cy.route({
-      method: 'GET',
-      url: '**/playsPerArtist?*',
-      response: []
-    });
     const loggedOutFirebase = {
       initializeApp: () => {},
       auth: () => {
@@ -480,8 +448,8 @@ describe('Stacked Area Graph Test', () => {
   it('Calls signOut when pressing logout', () => {
     // Stub response and never return anything
     cy.route({
-      method: 'GET',
-      url: '**/playsPerArtist?*',
+      method: 'POST',
+      url: '**/playsPerArtist*',
       response: []
     }).as('getInitData');
     let signedOut = false;
@@ -498,6 +466,13 @@ describe('Stacked Area Graph Test', () => {
             return new Promise((resolve, reject) => {});
           }
         }
+      },
+      functions: () => {
+        return {
+          httpsCallable: () => {
+            return () => Promise.resolve({data: []})
+          }
+        }
       }
     };
     cy.visit(
@@ -506,8 +481,6 @@ describe('Stacked Area Graph Test', () => {
         onBeforeLoad: (win) => win.firebase = listeningFirebase
       }
     );
-    // Wait for first request to finish
-    cy.wait(['@getInitData']);
     cy.contains('test_user').click();
     // Forcing the click was needed as it hangs over the graph and cypress
     // complained
