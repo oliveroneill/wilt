@@ -12,13 +12,17 @@ Create a `constants.js` file to specify the Google Cloud Functions backend and
 username that you want to query on.
 Format is:
 ```javascript
-// Endpoint to make requests to
-const apiGatewayEndpoint = "<ENTER-BACKEND-URL-HERE>";
 // Firebase config
 const firebaseConfig = {
-  apiKey: "<ENTER-FIREBASE-API-KEY>",
-  authDomain: "<AUTH-DOMAIN>",
-  projectId: "<FIREBASE-PROJECT-ID>",
+  apiKey: '<ENTER-FIREBASE-API-KEY>',
+  authDomain: '<AUTH-DOMAIN>',
+  projectId: '<FIREBASE-PROJECT-ID>',
+};
+
+// Spotify config
+const spotifyConfig = {
+  clientId: '<ENTER-SPOTIFY-CLIENT-ID>',
+  redirectUri: '<ENTER-SPOTIFY-REDIRECT-URI>',
 };
 ```
 

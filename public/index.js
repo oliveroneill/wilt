@@ -208,7 +208,6 @@ function query(period, start, end) {
 function checkConstants() {
   // Check that constants have been set up
   try {
-    const x = apiGatewayEndpoint;
     const y = firebaseConfig;
   } catch (e) {
     if (e instanceof ReferenceError) {

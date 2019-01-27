@@ -7,7 +7,6 @@ Cypress.on("window:before:load", win => {
   hideScrollbars(win);
   // Set constants to values that won't do anything
   win.firebaseConfig = {};
-  win.apiGatewayEndpoint = "http://pleasedontactuallyhitthisendpoint/";
 });
 
 /*
