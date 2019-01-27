@@ -24,11 +24,12 @@ function hideScrollbars(window) {
   style.appendChild(scrollBarStyle);
 }
 
-function mockFirebaseSignIn() {
-
-}
-
+/**
+ * Mock out the firebase functions API.
+ * Input is the promise to be returned from httpsCallable
+ */
 function mockFirebaseFunction(promise) {
+  // Create an object that we can stub
   const mockFunctions = {
     call: () => {}
   };
@@ -48,14 +49,12 @@ function mockFirebaseFunction(promise) {
       }
     }
   };
-  cy.stub(mockFunctions, 'call', (args) => {
-    console.log(args);
-    return promise;
-  });
+  // Stub with the promise
+  cy.stub(mockFunctions, 'call', (args) => promise);
   return mockFirebase;
 }
 
-describe('Stacked Area Graph Test', () => {
+describe('Stacked Area Graph snapshot tests', () => {
 
   beforeEach(() => {
     // Fix date to test queries
@@ -297,18 +296,25 @@ describe('Stacked Area Graph Test', () => {
     );
     cy.matchImageSnapshot('Loading screen before login');
   });
+});
 
-  /****************************************
-   REQUEST TESTS
-  ****************************************/
+describe('Stacked Area Graph UI assertions', () => {
+  let firebase;
+  let visitArgs;
+  beforeEach(() => {
+    // Fix date to test queries
+    const now = 1545079630000;
+    cy.clock(now);
+    cy.server();
+    cy.viewport('macbook-15');
+    // Mock firebase that just returns an empty data response
+    firebase = mockFirebaseFunction(Promise.resolve({data: []}));
+    visitArgs = {
+      onBeforeLoad: win => win.firebase = firebase
+    };
+  });
 
   it('Queries past two weeks', () => {
-    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
-    const visitArgs = {
-      onBeforeLoad: (win) => {
-        win.firebase = firebase;
-      }
-    };
     cy.visit('public/index.html', visitArgs);
     // Change to two weeks
     cy.get('#range').click();
@@ -320,12 +326,6 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Queries past year', () => {
-    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
-    const visitArgs = {
-      onBeforeLoad: (win) => {
-        win.firebase = firebase;
-      }
-    };
     cy.visit('public/index.html', visitArgs);
     // Change to two weeks
     cy.get('#range').click();
@@ -337,12 +337,6 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Queries past three months', () => {
-    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
-    const visitArgs = {
-      onBeforeLoad: (win) => {
-        win.firebase = firebase;
-      }
-    };
     cy.visit('public/index.html', visitArgs);
     // Change to two weeks
     cy.get('#range').click();
@@ -354,12 +348,6 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Queries group by day', () => {
-    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
-    const visitArgs = {
-      onBeforeLoad: (win) => {
-        win.firebase = firebase;
-      }
-    };
     cy.visit('public/index.html', visitArgs);
     // Change to two weeks
     cy.get('#groupby').click();
@@ -371,12 +359,6 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Queries group by month', () => {
-    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
-    const visitArgs = {
-      onBeforeLoad: (win) => {
-        win.firebase = firebase;
-      }
-    };
     cy.visit('public/index.html', visitArgs);
     // Change to two weeks
     cy.get('#groupby').click();
@@ -388,12 +370,6 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Queries group by week', () => {
-    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
-    const visitArgs = {
-      onBeforeLoad: (win) => {
-        win.firebase = firebase;
-      }
-    };
     cy.visit('public/index.html', visitArgs);
     // Change to two weeks
     cy.get('#groupby').click();
@@ -405,12 +381,6 @@ describe('Stacked Area Graph Test', () => {
   });
 
   it('Queries custom range', () => {
-    const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
-    const visitArgs = {
-      onBeforeLoad: (win) => {
-        win.firebase = firebase;
-      }
-    };
     cy.visit('public/index.html', visitArgs);
     // Change to two weeks
     cy.get('#range').click();
@@ -431,8 +401,7 @@ describe('Stacked Area Graph Test', () => {
         return {
           onAuthStateChanged: callback => {
             callback(null);
-          },
-          signOut: () => {}
+          }
         }
       }
     };
