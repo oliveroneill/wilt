@@ -26,6 +26,11 @@ const spotifyConfig = {
 };
 ```
 
+Set firebase function configuration:
+```bash
+firebase functions:config:set spotify.client_id="<ENTER-SPOTIFY-CLIENT-ID>" spotify.client_secret="<ENTER-SPOTIFY-CLIENT-SECRET>" spotify.redirect_uri="<ENTER-SPOTIFY-REDIRECT-URI>"
+```
+
 ## Testing
 ```bash
 npm test
@@ -50,5 +55,6 @@ points, however it won't show all of them.
 ![My play history](screenshot.png)
 
 ## TODO
+- Testing around login page
 - Better annotation placement
 - Fix hover labels not showing every point

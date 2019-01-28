@@ -22,17 +22,26 @@
       .column {
         max-width: 450px;
       }
+      .error {
+        display: none;
+        padding-left: 30px;
+        padding-right: 30px;
+      }
     </style>
   </head>
   <script>
     // Initialise Firebase
     const app = firebase.initializeApp(firebaseConfig);
     function login() {
+      // Generate a random string for state
+      const state = Math.random().toString(36).substring(7);
       function getLoginURL(scopes) {
+        // Using Authorization Code Flow for Spotify Web API
         return 'https://accounts.spotify.com/authorize?client_id=' + spotifyConfig.clientId +
           '&redirect_uri=' + encodeURIComponent(spotifyConfig.redirectUri) +
           '&scope=' + encodeURIComponent(scopes.join(' ')) +
-          '&response_type=token';
+          '&state=' + state +
+          '&response_type=code';
       }
       const url = getLoginURL([
         'user-read-email'
@@ -40,20 +49,14 @@
       return new Promise((resolve, reject) => {
         window.addEventListener('message', event => {
           const hash = JSON.parse(event.data);
-          if (hash.type == 'access_token') {
-            resolve(hash.access_token);
+          // Check that state matches our random string
+          if (hash.state == state) {
+            resolve(hash.code);
           }
         }, false);
         // Show spotify auth popup
         window.open(url, 'Spotify', 'height=600,width=400');
       });
-    }
-
-    function getUserData(accessToken) {
-      return fetch(
-        'https://api.spotify.com/v1/me',
-        { 'headers': {'Authorization': 'Bearer ' + accessToken } }
-      );
     }
 
     function signIn() {
@@ -62,12 +65,12 @@
       // Hide login
       document.getElementById('login-form').style.display = "none";
       login()
-        .then(accessToken => getUserData(accessToken))
-        .then(response => response.json())
-        .then(data => {
+        .then(code => {
           // Call the signup function with the spotify id
           const signUp = firebase.functions().httpsCallable('signUp');
-          return signUp({user_id: `spotify:${data.id}`});
+          // Pass in the Spotify auth code so that the firebase function can
+          // finish the authorisation
+          return signUp({ spotifyAuthCode: code });
         })
         .then(result => {
           // Sign in with the token from the function
@@ -78,6 +81,7 @@
           window.location.replace("index.html");
         }).catch(error => {
           console.error(error);
+          document.getElementById("error").style.display = "block";
         });
     }
     firebase.auth().onAuthStateChanged(user => {
@@ -93,6 +97,15 @@
         <div class="ui text loader">Signing in...</div>
       </div>
       <p></p>
+    </div>
+
+    <!-- Error message -->
+    <div id="error" class="error">
+      <div class="ui negative message">
+        <div class="header">
+          Sorry! Something wen't wrong.
+        </div>
+      </div>
     </div>
 
     <div id="login-form" class="ui middle aligned center aligned grid">
