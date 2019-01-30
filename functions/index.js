@@ -1,7 +1,6 @@
 'use strict';
 
 const SpotifyWebApi = require('spotify-web-api-node');
-const escapeHtml = require('escape-html');
 const {BigQuery} = require('@google-cloud/bigquery');
 const functions = require('firebase-functions');
 const cors = require('cors')({ origin: true });
@@ -69,7 +68,7 @@ exports.playsPerArtist = functions.https.onCall((data, context) => {
   end = Math.ceil(end);
   // Set extract SQL query based on group by
   var extract;
-  var interval = escapeHtml(data.group_by);
+  var interval = data.group_by;
   switch (interval) {
     case 'day':
         extract = 'DAYOFYEAR';
