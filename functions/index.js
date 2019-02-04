@@ -19,11 +19,11 @@ function storeUser(spotifyApi, spotifyData) {
     .then(userData => {
       // Store Spotify data for user
       var db = admin.firestore();
-      db.settings( { timestampsInSnapshots: true });
+      db.settings({ timestampsInSnapshots: true });
       // Create ID
       const id = `spotify:${userData.id}`;
       // Store in Firestore
-      var docRef = db.collection('users').doc(id);
+      const docRef = db.collection('users').doc(id);
       const now = new Date().getTime();
       docRef.set({
         access_token: spotifyData.access_token,
@@ -47,6 +47,8 @@ exports.signUp = functions.https.onCall((data, context) => {
   return spotifyApi.authorizationCodeGrant(data.spotifyAuthCode)
     .then(data => Promise.resolve(data.body))
     // Store Spotify user auth and ID in Firestore
+    // TODO: we probably shouldn't store the user until we've successfully
+    // created a token. Since it still won't fail
     .then(data => storeUser(spotifyApi, data))
     .then(id => admin.auth().createCustomToken(id))
     .then(customToken => { return { 'token': customToken } });

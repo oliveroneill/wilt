@@ -18,3 +18,4 @@ before_install:
 script:
   - "$(npm bin)/cypress run --record --key ${CYPRESS_RECORD_KEY}"
   - python upload_failures.py
+  - cd functions/ && npm test
