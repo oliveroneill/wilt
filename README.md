@@ -31,6 +31,21 @@ Set firebase function configuration:
 firebase functions:config:set spotify.client_id="<ENTER-SPOTIFY-CLIENT-ID>" spotify.client_secret="<ENTER-SPOTIFY-CLIENT-SECRET>" spotify.redirect_uri="<ENTER-SPOTIFY-REDIRECT-URI>"
 ```
 
+## Setup
+This project uses BigQuery, Firestore and Firebase Authentication.
+
+### BigQuery
+You'll need to create a BigQuery table called `wilt_play_history.play_history`.
+
+#### Table Columns
+play_history (BigQuery): user_id, date, artists, name, primary_artist, track_id
+
+users (FireStore): access_token, expires_at, refresh_token
+
+### FireStore
+You'll need to create a table called `users`.
+
+
 ## Testing
 ```bash
 npm test
@@ -40,7 +55,7 @@ To use the UI run `npm run cypress:open`, however for some reason the
 visual regression tests will fail when run via the UI - I'm still investigating
 this.
 
-NOTE: tests the timezone is `Australia/Sydney`. This is a limitation of
+NOTE: the timezone for the tests is `Australia/Sydney`. This is a limitation of
 cypress, documented [here](https://github.com/cypress-io/cypress/issues/1043).
 Travis has been setup with this timezone.
 
