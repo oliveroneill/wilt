@@ -1,6 +1,6 @@
 # Wilt - What I Listen To
 
-[![Build Status](https://travis-ci.org/oliveroneill/wilt-browser.svg?branch=master)](https://travis-ci.org/oliveroneill/wilt-browser)
+[![Build Status](https://travis-ci.org/oliveroneill/wilt.svg?branch=master)](https://travis-ci.org/oliveroneill/wilt)
 
 This is a browser client for displaying Wilt metrics.
 
