@@ -111,6 +111,7 @@ describe('Sign up function', () => {
       assert.equal(tokenArgs, 'spotify:' + spotifyId);
       // Check the custom token created matches
       assert.deepEqual(result, { token: customToken });
+      return null;
     }).catch(e => {
       assert.fail(e);
     });
@@ -125,6 +126,7 @@ describe('Sign up function', () => {
     spotifyAuthStub.returns(Promise.reject(expected));
     return functions.signUp.run(data, {}).then(result => {
       assert.fail("We succeeded somehow");
+      return null;
     }).catch(e => {
       assert.equal(e, expected);
     });
@@ -139,6 +141,7 @@ describe('Sign up function', () => {
     spotifyMeStub.returns(Promise.reject(expected));
     return functions.signUp.run(data, {}).then(result => {
       assert.fail("We succeeded somehow");
+      return null;
     }).catch(e => {
       assert.equal(e, expected);
     });
@@ -153,6 +156,7 @@ describe('Sign up function', () => {
     createCustomTokenStub.returns(Promise.reject(expected));
     return functions.signUp.run(data, {}).then(result => {
       assert.fail("We succeeded somehow");
+      return null;
     }).catch(e => {
       assert.equal(e, expected);
     });
