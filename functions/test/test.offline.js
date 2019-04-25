@@ -9,7 +9,7 @@ const test = require('firebase-functions-test')();
 const SpotifyWebApi = require('spotify-web-api-node');
 
 test.mockConfig(
-  { spotify: { client_id: '', client_secret: '', redirect_uri: '' } }
+  { spotify: { client_id: '', client_secret: '' } }
 );
 
 describe('Sign up function', () => {

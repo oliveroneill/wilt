@@ -72,7 +72,12 @@
           const signUp = firebase.functions().httpsCallable('signUp');
           // Pass in the Spotify auth code so that the firebase function can
           // finish the authorisation
-          return signUp({ spotifyAuthCode: code });
+          return signUp(
+            {
+              spotifyAuthCode: code,
+              spotifyRedirectUri: spotifyConfig.redirectUri,
+            }
+          );
         })
         .then(result => {
           // Sign in with the token from the function

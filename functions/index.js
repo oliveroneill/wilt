@@ -39,7 +39,7 @@ exports.signUp = functions.https.onCall((data, context) => {
   const spotifyApi = new SpotifyWebApi({
     clientId: functions.config().spotify.client_id,
     clientSecret: functions.config().spotify.client_secret,
-    redirectUri: functions.config().spotify.redirect_uri
+    redirectUri: data.spotifyRedirectUri,
   });
   // Authorise using the spotify code so we can store a refresh token
   // to periodically read user's play history

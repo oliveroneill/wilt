@@ -28,7 +28,7 @@ const spotifyConfig = {
 
 Set firebase function configuration:
 ```bash
-firebase functions:config:set spotify.client_id="<ENTER-SPOTIFY-CLIENT-ID>" spotify.client_secret="<ENTER-SPOTIFY-CLIENT-SECRET>" spotify.redirect_uri="<ENTER-SPOTIFY-REDIRECT-URI>"
+firebase functions:config:set spotify.client_id="<ENTER-SPOTIFY-CLIENT-ID>" spotify.client_secret="<ENTER-SPOTIFY-CLIENT-SECRET>"
 ```
 
 ## Setup
