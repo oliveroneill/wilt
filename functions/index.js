@@ -19,7 +19,6 @@ function storeUser(spotifyApi, spotifyData) {
     .then(userData => {
       // Store Spotify data for user
       var db = admin.firestore();
-      db.settings({ timestampsInSnapshots: true });
       // Create ID
       const id = `spotify:${userData.id}`;
       // Store in Firestore
