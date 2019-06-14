@@ -130,14 +130,25 @@ exports.playsPerArtist = functions.https.onCall((data, context) => {
     ) GROUP BY period, year, playdate, primary_artist ORDER BY period, year
   ) GROUP BY primary_artist`;
 
-  return bigQuery.query({
+  var job;
+  return bigQuery.createQueryJob({
     query: sqlQuery,
     params: {
       user: user,
       start: start,
       end: end,
     },
-  }).then(([rows]) => {
-    return rows;
-  });
+  }).then(results => {
+      job = results[0];
+      console.log(`Job ${job.id} started.`);
+      return job.promise();
+    })
+    .then(() => job.getMetadata())
+    .then(() => {
+      console.log(`Job ${job.id} completed.`);
+      return job.getQueryResults();
+    })
+    .then(([rows]) => {
+      return rows;
+    });
 });
