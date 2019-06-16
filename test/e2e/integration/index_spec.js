@@ -42,9 +42,13 @@ function mockFirebaseFunction(promise) {
         signOut: () => {}
       }
     },
-    functions: () => {
+    app: () => {
       return {
-        httpsCallable: (name) => mockFunctions.call
+        functions: () => {
+          return {
+            httpsCallable: (name) => mockFunctions.call
+          }
+        }
       }
     }
   };
@@ -140,7 +144,7 @@ describe('Stacked Area Graph snapshot tests', () => {
       }
     };
     cy.visit('public/index.html', visitArgs).then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1537220830, end: 1545079630, group_by: 'week'}
       );
     });
@@ -233,7 +237,7 @@ describe('Stacked Area Graph snapshot tests', () => {
       }
     };
     cy.visit('public/index.html', visitArgs).then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1537220830, end: 1545079630, group_by: 'week'}
       );
     });
@@ -256,7 +260,7 @@ describe('Stacked Area Graph snapshot tests', () => {
 
   it('Shows loading screen when group changes', () => {
     const firebase = mockFirebaseFunction(Promise.resolve({data: []}));
-    firebase.functions().httpsCallable().onCall(1).returns(
+    firebase.app().functions().httpsCallable().onCall(1).returns(
       new Promise((resolve, reject) => {})
     );
     const visitArgs = {
@@ -268,7 +272,7 @@ describe('Stacked Area Graph snapshot tests', () => {
     // Change to two weeks
     cy.get('#groupby').click();
     cy.contains('Month').click().then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1537220830, end: 1545079630, group_by: 'month'}
       );
     });
@@ -318,7 +322,7 @@ describe('Stacked Area Graph UI assertions', () => {
     // Change to two weeks
     cy.get('#range').click();
     cy.contains('Past two weeks').click().then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1543870030, end: 1545079630, group_by: 'week'}
       );
     });
@@ -329,7 +333,7 @@ describe('Stacked Area Graph UI assertions', () => {
     // Change to two weeks
     cy.get('#range').click();
     cy.contains('Past year').click().then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1513543630, end: 1545079630, group_by: 'week'}
       );
     });
@@ -340,7 +344,7 @@ describe('Stacked Area Graph UI assertions', () => {
     // Change to two weeks
     cy.get('#range').click();
     cy.contains('Past three months').click().then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1537220830, end: 1545079630, group_by: 'week'}
       );
     });
@@ -351,7 +355,7 @@ describe('Stacked Area Graph UI assertions', () => {
     // Change to two weeks
     cy.get('#groupby').click();
     cy.contains('Day').click().then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1537220830, end: 1545079630, group_by: 'day'}
       );
     });
@@ -362,7 +366,7 @@ describe('Stacked Area Graph UI assertions', () => {
     // Change to two weeks
     cy.get('#groupby').click();
     cy.contains('Month').click().then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1537220830, end: 1545079630, group_by: 'month'}
       );
     });
@@ -373,7 +377,7 @@ describe('Stacked Area Graph UI assertions', () => {
     // Change to two weeks
     cy.get('#groupby').click();
     cy.contains('Week').click().then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1537220830, end: 1545079630, group_by: 'week'}
       );
     });
@@ -387,7 +391,7 @@ describe('Stacked Area Graph UI assertions', () => {
     cy.get('#range-start').click();
     cy.get('#range-start').contains('15').click();
     cy.get('#range-end').contains('22').click().then(() => {
-      expect(firebase.functions().httpsCallable()).to.be.calledWith(
+      expect(firebase.app().functions().httpsCallable()).to.be.calledWith(
         {start: 1544820420, end: 1545425220, group_by: 'week'}
       );
     });
