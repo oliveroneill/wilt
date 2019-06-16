@@ -191,7 +191,7 @@ exports.getTopArtist = functions
         grouped.year,
         grouped.playdate,
         grouped.primary_artist,
-        IFNULL(count, 0) AS count
+        count
       FROM (
         wilt_play_history.play_history
         CROSS JOIN (
@@ -220,6 +220,7 @@ exports.getTopArtist = functions
         EXTRACT(YEAR FROM play_history.date) = grouped.year AND
         grouped.primary_artist = play_history.primary_artist AND
         play_history.user_id = @user
+        WHERE count IS NOT NULL
     ) GROUP BY period, year, playdate, primary_artist)
     SELECT MAX(sq.primary_artist) AS top_artist, MAX(sq.events) AS count,
       FORMAT_DATE("%F", sq.playdate) AS date FROM subquery sq,
