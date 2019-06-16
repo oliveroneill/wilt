@@ -192,7 +192,9 @@ function query(period, start, end) {
     return;
   }
   // Create the query
-  const playQuery = firebase.functions().httpsCallable('playsPerArtist');
+  const playQuery = firebase.app().functions('asia-northeast1').httpsCallable(
+    'playsPerArtist'
+  );
   // Show loading screen
   uiStates.loading();
   // Make HTTP request to get data

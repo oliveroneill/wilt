@@ -34,7 +34,9 @@ function storeUser(spotifyApi, spotifyData) {
 }
 
 // Create token for custom user
-exports.signUp = functions.https.onCall((data, context) => {
+exports.signUp = functions
+  .region('asia-northeast1')
+  .https.onCall((data, context) => {
   // Create Spotify Web API instance using firebase function config
   const spotifyApi = new SpotifyWebApi({
     clientId: functions.config().spotify.client_id,
@@ -53,7 +55,9 @@ exports.signUp = functions.https.onCall((data, context) => {
     .then(customToken => { return { 'token': customToken } });
 });
 
-exports.playsPerArtist = functions.https.onCall((data, context) => {
+exports.playsPerArtist = functions
+    .region('asia-northeast1')
+    .https.onCall((data, context) => {
   const user = context.auth.uid;
   var start = data.start;
   if (start === undefined) {
@@ -154,7 +158,9 @@ exports.playsPerArtist = functions.https.onCall((data, context) => {
     });
 });
 
-exports.getTopArtist = functions.https.onCall((data, context) => {
+exports.getTopArtist = functions
+  .region('asia-northeast1')
+  .https.onCall((data, context) => {
   const user = context.auth.uid;
   var start = data.start;
   if (start === undefined) {

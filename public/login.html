@@ -69,7 +69,9 @@
       login()
         .then(code => {
           // Call the signup function with the spotify id
-          const signUp = firebase.functions().httpsCallable('signUp');
+          const signUp = firebase.app().functions('asia-northeast1').httpsCallable(
+            'signUp'
+          );
           // Pass in the Spotify auth code so that the firebase function can
           // finish the authorisation
           return signUp(
