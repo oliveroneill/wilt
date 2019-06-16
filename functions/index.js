@@ -126,7 +126,8 @@ exports.playsPerArtist = functions.https.onCall((data, context) => {
         ) AS period_data
       ) AS grouped ON EXTRACT(${extract} FROM play_history.date) = grouped.period AND
         EXTRACT(YEAR FROM play_history.date) = grouped.year AND
-        grouped.primary_artist = play_history.primary_artist
+        grouped.primary_artist = play_history.primary_artist AND
+        play_history.user_id = @user
     ) GROUP BY period, year, playdate, primary_artist ORDER BY period, year
   ) GROUP BY primary_artist`;
 
@@ -211,8 +212,9 @@ exports.getTopArtist = functions.https.onCall((data, context) => {
         ) AS period_data
       ) AS grouped ON EXTRACT(${extract} FROM play_history.date) = grouped.period AND
         EXTRACT(YEAR FROM play_history.date) = grouped.year AND
-        grouped.primary_artist = play_history.primary_artist
-    ) GROUP BY period, year, playdate, primary_artist ORDER BY period, year)
+        grouped.primary_artist = play_history.primary_artist AND
+        play_history.user_id = @user
+    ) GROUP BY period, year, playdate, primary_artist)
     SELECT MAX(sq.primary_artist) AS top_artist, MAX(sq.events) AS count,
       FORMAT_DATE("%F", sq.playdate) AS date FROM subquery sq,
     (SELECT MAX(events) AS count, playdate FROM subquery GROUP BY playdate) max_results
