@@ -439,10 +439,14 @@ describe('Stacked Area Graph UI assertions', () => {
           }
         }
       },
-      functions: () => {
+      app: () => {
         return {
-          httpsCallable: () => {
-            return () => Promise.resolve({data: []})
+          functions: () => {
+            return {
+              httpsCallable: () => {
+                return () => Promise.resolve({data: []})
+              }
+            }
           }
         }
       }
