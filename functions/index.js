@@ -175,8 +175,8 @@ exports.getTopArtist = functions
   // The SQL query requires integers so we clamp values as needed
   end = Math.ceil(end);
   // Set extract SQL query based on group by
-  var extract = 'MONTH';
-  var interval = 'MONTH';
+  var extract = 'WEEK';
+  var interval = 'WEEK';
   const bigQuery = new BigQuery();
   const sqlQuery = `
   WITH subquery AS (
