@@ -182,6 +182,7 @@ exports.getTopArtist = functions
   WITH subquery AS (
     SELECT
       period,
+      year,
       playdate,
       primary_artist,
       SUM(count) AS events
@@ -223,10 +224,11 @@ exports.getTopArtist = functions
         WHERE count IS NOT NULL
     ) GROUP BY period, year, playdate, primary_artist)
     SELECT MAX(sq.primary_artist) AS top_artist, MAX(sq.events) AS count,
-      FORMAT_DATE("%F", sq.playdate) AS date FROM subquery sq,
-    (SELECT MAX(events) AS count, playdate FROM subquery GROUP BY playdate) max_results
-    WHERE sq.playdate = max_results.playdate AND sq.events= max_results.count
-    GROUP BY sq.playdate ORDER BY sq.playdate DESC;`;
+      FORMAT_DATE("%F", sq.playdate) AS date, FORMAT('%d-%d', sq.period, sq.year) AS week FROM subquery sq,
+    (SELECT MAX(events) AS count, playdate, period, year FROM subquery GROUP BY playdate, period, year) max_results
+    WHERE sq.playdate = max_results.playdate AND sq.events = max_results.count AND
+    sq.period = max_results.period AND sq.year = max_results.year
+    GROUP BY sq.playdate, sq.period, sq.year ORDER BY sq.playdate DESC;`;
 
   var job;
   return bigQuery.createQueryJob({
