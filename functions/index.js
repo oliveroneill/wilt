@@ -58,6 +58,12 @@ exports.signUp = functions
 exports.playsPerArtist = functions
     .region('asia-northeast1')
     .https.onCall((data, context) => {
+  // Checking that the user is authenticated.
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated', 'The function must be called while authenticated'
+    );
+  }
   const user = context.auth.uid;
   var start = data.start;
   if (start === undefined) {
@@ -161,6 +167,12 @@ exports.playsPerArtist = functions
 exports.getTopArtist = functions
   .region('asia-northeast1')
   .https.onCall((data, context) => {
+  // Checking that the user is authenticated.
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated', 'The function must be called while authenticated'
+    );
+  }
   const user = context.auth.uid;
   var start = data.start;
   if (start === undefined) {
