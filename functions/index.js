@@ -164,7 +164,7 @@ exports.playsPerArtist = functions
     });
 });
 
-exports.getTopArtist = functions
+exports.getTopArtistPerWeek = functions
   .region('asia-northeast1')
   .https.onCall((data, context) => {
   // Checking that the user is authenticated.
