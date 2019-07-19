@@ -67,13 +67,17 @@ exports.playsPerArtist = functions
   const user = context.auth.uid;
   var start = data.start;
   if (start === undefined) {
-    throw new Error('Missing start parameter');
+    throw new functions.https.HttpsError(
+      'invalid-argument', 'Missing start parameter'
+    );
   }
   // The SQL query requires integers so we clamp values as needed
   start = Math.floor(start);
   var end = data.end;
   if (end === undefined) {
-    throw new Error('Missing end parameter');
+    throw new functions.https.HttpsError(
+      'invalid-argument', 'Missing end parameter'
+    );
   }
   // The SQL query requires integers so we clamp values as needed
   end = Math.ceil(end);
@@ -176,13 +180,17 @@ exports.getTopArtistPerWeek = functions
   const user = context.auth.uid;
   var start = data.start;
   if (start === undefined) {
-    throw new Error('Missing start parameter');
+    throw new functions.https.HttpsError(
+      'invalid-argument', 'Missing start parameter'
+    );
   }
   // The SQL query requires integers so we clamp values as needed
   start = Math.floor(start);
   var end = data.end;
   if (end === undefined) {
-    throw new Error('Missing end parameter');
+    throw new functions.https.HttpsError(
+      'invalid-argument', 'Missing end parameter'
+    );
   }
   // The SQL query requires integers so we clamp values as needed
   end = Math.ceil(end);
