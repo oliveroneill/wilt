@@ -272,3 +272,91 @@ exports.getTopArtistPerWeek = functions
       return rows;
     });
 });
+
+function getNumberOfPlays(bigQuery, artistName, userName) {
+  var job;
+  return bigQuery.createQueryJob({
+    query: `SELECT COUNT(*) AS count FROM wilt_play_history.play_history
+      WHERE primary_artist = '${artistName}' AND user_id = '${userName}'`,
+  }).then(results => {
+      job = results[0];
+      console.log(`Job ${job.id} started.`);
+      return job.promise();
+    })
+    .then(() => job.getMetadata())
+    .then(() => {
+      console.log(`Job ${job.id} completed.`);
+      return job.getQueryResults();
+    })
+    .then(([rows]) => {
+      // Return zero if this artist hasn't been played
+      if (rows.length === 0) return 0;
+      return rows[0].count;
+    });
+}
+
+function getDateLastPlayed(bigQuery, artistName, userName) {
+  var job;
+  return bigQuery.createQueryJob({
+    query: `SELECT date FROM wilt_play_history.play_history
+      WHERE primary_artist = '${artistName}' AND user_id = '${userName}' ORDER BY date DESC LIMIT 1`,
+  }).then(results => {
+      job = results[0];
+      console.log(`Job ${job.id} started.`);
+      return job.promise();
+    })
+    .then(() => job.getMetadata())
+    .then(() => {
+      console.log(`Job ${job.id} completed.`);
+      return job.getQueryResults();
+    })
+    .then(([rows]) => {
+      // Return null if this artist hasn't been played
+      if (rows.length === 0) return null;
+      return rows[0].date;
+    });
+}
+
+function getArtistInfo(artistData, userName) {
+  console.log(artistData);
+  const bigQuery = new BigQuery();
+  const artistName = artistData.name;
+  return Promise.all(
+    [
+      getNumberOfPlays(bigQuery, artistName, userName),
+      getDateLastPlayed(bigQuery, artistName, userName),
+    ]
+  ).then(values => {
+    return {name: artistName, count: values[0], lastPlay: values[1]}
+  });
+}
+
+exports.topArtist = functions
+  .region('asia-northeast1')
+  .https.onCall((data, context) => {
+  // Checking that the user is authenticated.
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated', 'The function must be called while authenticated'
+    );
+  }
+  const user = context.auth.uid;
+  // Create Spotify Web API instance using firebase function config
+  const spotifyApi = new SpotifyWebApi({
+    clientId: functions.config().spotify.client_id,
+    clientSecret: functions.config().spotify.client_secret,
+  });
+  let db = admin.firestore();
+  return db.collection('users').doc(user).get()
+    .then(snapshot => {
+      const doc = snapshot.data();
+      spotifyApi.setAccessToken(doc.access_token);
+      spotifyApi.setRefreshToken(doc.refresh_token);
+      return spotifyApi.refreshAccessToken()
+    })
+    .then(data => {
+      spotifyApi.setAccessToken(data.body.access_token);
+      return spotifyApi.getMyTopArtists({limit: 1, time_range: 'long_term'});
+    })
+    .then(data => getArtistInfo(data.body.items[0], user));
+});
