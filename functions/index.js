@@ -418,10 +418,22 @@ exports.topArtist = functions
       'unauthenticated', 'The function must be called while authenticated'
     );
   }
+  var timeRange = data.timeRange;
+  if (timeRange === undefined) {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 'Missing time range parameter'
+    );
+  }
+  var index = data.index;
+  if (index === undefined) {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 'Missing index parameter'
+    );
+  }
   const user = context.auth.uid;
   return getSpotifyClient(user)
     .then(spotifyApi => {
-      return spotifyApi.getMyTopArtists({limit: 1, time_range: 'long_term'});
+      return spotifyApi.getMyTopArtists({limit: 1, time_range: timeRange, offset: index});
     })
     .then(data => getArtistInfo(data.body.items[0], user));
 });
@@ -435,10 +447,22 @@ exports.topTrack = functions
       'unauthenticated', 'The function must be called while authenticated'
     );
   }
+  var timeRange = data.timeRange;
+  if (timeRange === undefined) {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 'Missing time range parameter'
+    );
+  }
+  var index = data.index;
+  if (index === undefined) {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 'Missing index parameter'
+    );
+  }
   const user = context.auth.uid;
   return getSpotifyClient(user)
     .then(spotifyApi => {
-      return spotifyApi.getMyTopTracks({limit: 1, time_range: 'long_term'});
+      return spotifyApi.getMyTopTracks({limit: 1, time_range: timeRange, offset: index});
     })
     .then(data => getTrackInfo(data.body.items[0], user));
 });
