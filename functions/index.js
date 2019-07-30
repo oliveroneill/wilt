@@ -326,7 +326,12 @@ function getArtistInfo(artistData, userName) {
       getDateLastPlayed(bigQuery, artistName, userName),
     ]
   ).then(values => {
-    return {name: artistName, count: values[0], lastPlay: values[1]}
+    return {
+      name: artistName,
+      count: values[0],
+      lastPlay: values[1],
+      imageUrl: artistData.images[0].url,
+    }
   });
 }
 
@@ -385,7 +390,12 @@ function getTrackInfo(trackData, userName) {
       getDateLastPlayedForTrack(bigQuery, trackID, userName),
     ]
   ).then(values => {
-    return {name: trackName, totalPlayTimeMs: values[0], lastPlay: values[1]}
+    return {
+      name: trackName,
+      totalPlayTimeMs: values[0],
+      lastPlay: values[1],
+      imageUrl: trackData.album.images[0].url,
+    }
   });
 }
 
