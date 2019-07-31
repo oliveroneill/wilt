@@ -269,9 +269,25 @@ exports.getTopArtistPerWeek = functions
       return job.getQueryResults();
     })
     .then(([rows]) => {
-      return rows;
+      return addImages(rows, user);
     });
 });
+
+function getImageForArtist(artist) {
+  return spotifyApi.searchArtists(artist.top_artist)
+  .then(result => {
+    artist.imageUrl = result.body.artists.items[0].images[0].url;
+    return Promise.resolve(artist);
+  });
+}
+
+function addImages(artistList, user) {
+    return getSpotifyClient(user)
+    .then(spotifyApi => {
+      let promises = artistList.map(getImageForArtist);
+      return Promise.all(promises);
+    });
+}
 
 function getNumberOfPlays(bigQuery, artistName, userName) {
   var job;
