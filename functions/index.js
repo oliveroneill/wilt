@@ -273,7 +273,7 @@ exports.getTopArtistPerWeek = functions
     });
 });
 
-function getImageForArtist(artist) {
+function getImageForArtist(spotifyApi, artist) {
   return spotifyApi.searchArtists(artist.top_artist)
   .then(result => {
     artist.imageUrl = result.body.artists.items[0].images[0].url;
@@ -284,7 +284,9 @@ function getImageForArtist(artist) {
 function addImages(artistList, user) {
     return getSpotifyClient(user)
     .then(spotifyApi => {
-      let promises = artistList.map(getImageForArtist);
+      let promises = artistList.map(artist => {
+        return getImageForArtist(spotifyApi, artist);
+      });
       return Promise.all(promises);
     });
 }
