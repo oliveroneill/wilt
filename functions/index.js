@@ -364,7 +364,10 @@ ORDER BY per_week.playdate DESC;`;
 function getImageForArtist(spotifyApi, artist) {
   return spotifyApi.searchArtists(artist.top_artist)
   .then(result => {
-    artist.imageUrl = result.body.artists.items[0].images[0].url;
+    const artistData = result.body.artists.items[0];
+    artist.imageUrl = artistData.images[0].url;
+    artist.externalUrl = artistData.external_urls.spotify;
+    artist.spotifyUrl = artistData.uri;
     return Promise.resolve(artist);
   });
 }
@@ -437,6 +440,8 @@ function getArtistInfo(artistData, userName) {
       count: values[0],
       lastPlay: values[1],
       imageUrl: artistData.images[0].url,
+      externalUrl: artistData.external_urls.spotify,
+      spotifyUrl: artistData.uri
     }
   });
 }
@@ -501,6 +506,8 @@ function getTrackInfo(trackData, userName) {
       totalPlayTimeMs: values[0],
       lastPlay: values[1],
       imageUrl: trackData.album.images[0].url,
+      externalUrl: trackData.external_urls.spotify,
+      spotifyUrl: trackData.uri
     }
   });
 }
