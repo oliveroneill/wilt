@@ -589,3 +589,16 @@ exports.topTrack = functions
     })
     .then(data => getTrackInfo(data.body.items[0], user));
 });
+
+exports.getSpotifyAuthToken = functions
+  .region('asia-northeast1')
+  .https.onRequest((req, res) => {
+  // Create Spotify Web API instance using firebase function config
+  const spotifyApi = new SpotifyWebApi({
+    clientId: functions.config().spotify.client_id,
+    clientSecret: functions.config().spotify.client_secret,
+  });
+  return spotifyApi.clientCredentialsGrant()
+    .then(data => Promise.resolve(data.body))
+    .then(data => res.status(200).send({ 'token': data.access_token }));
+});
