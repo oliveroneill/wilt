@@ -427,6 +427,11 @@ function getDateLastPlayed(bigQuery, artistName, userName) {
 }
 
 function getArtistInfo(artistData, userName) {
+  if (artistData === undefined) {
+    throw new functions.https.HttpsError(
+      'not-found', 'No data available for top artist'
+    );
+  }
   const bigQuery = new BigQuery();
   const artistName = artistData.name;
   return Promise.all(
@@ -491,6 +496,11 @@ function getTotalPlayTime(bigQuery, trackID, userName, durationMs) {
 }
 
 function getTrackInfo(trackData, userName) {
+  if (trackData === undefined) {
+    throw new functions.https.HttpsError(
+      'not-found', 'No data available for top track'
+    );
+  }
   const bigQuery = new BigQuery();
   // Just use the first artists name for now
   const trackName = `${trackData.name} by ${trackData.artists[0].name}`;
