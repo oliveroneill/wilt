@@ -2,10 +2,19 @@
 
 [![Build Status](https://travis-ci.org/oliveroneill/wilt.svg?branch=master)](https://travis-ci.org/oliveroneill/wilt)
 
-This is a browser client for displaying Wilt metrics.
+A project for tracking user's listening habits.
+
+This repository contains:
+- A browser client for diplaying metrics (in `public/`)
+- A server-side API for helping clients query the database (in `functions/`).
 
 This will display a timeline of play history for the specified user.
 Inspired by [LastWave](https://github.com/taurheim/LastWave).
+
+Clients:
+- iOS: [Github](https://github.com/oliveroneill/wilt-ios)
+- Android: [Github](https://github.com/oliveroneill/wilt-android)
+- Browser (here, see `public/`)
 
 ## Installation
 Create a `constants.js` file to specify the Google Cloud Functions backend and
@@ -45,6 +54,11 @@ users (FireStore): access_token, expires_at, refresh_token
 ### FireStore
 You'll need to create a table called `users`.
 
+### WiltCollector
+
+In order to periodically collect metrics from users, you'll also need
+to set up [WiltCollector](https://github.com/oliveroneill/WiltCollector).
+The README instructions will help you set this up with AWS Lambda.
 
 ## Testing
 ```bash
