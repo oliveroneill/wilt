@@ -15,6 +15,26 @@ function addURLs(track, user) {
     });
 }
 
+function generateQueryString(before, after, artistSearchQuery) {
+  console.log('query before:', artistSearchQuery);
+  if (artistSearchQuery !== null) {
+    artistSearchQuery = artistSearchQuery.toLowerCase();
+  }
+  console.log('query:', artistSearchQuery);
+  const couldPickupCommonWord = artistSearchQuery === 't' || artistSearchQuery === 'th';
+  return `
+    SELECT primary_artist AS artist_name, date, name AS song_name, track_id
+    FROM wilt_play_history.play_history
+    WHERE user_id = @user
+    AND ${before === null ? 'UNIX_SECONDS(date) > @after' : 'UNIX_SECONDS(date) < @before'}
+    ${artistSearchQuery !== null ? `AND (LOWER(primary_artist) LIKE '${artistSearchQuery}%'` : ''}
+    ${artistSearchQuery !== null ? `OR LOWER(primary_artist) LIKE '% ${artistSearchQuery}%')` : ''}
+    ${couldPickupCommonWord ? `AND LOWER(primary_artist) NOT LIKE '% the %'` : ''}
+    ORDER BY date DESC
+    LIMIT @limit
+  `;
+}
+
 exports.getTrackHistory = functions
   .region('asia-northeast1')
   .https.onCall((data, context) => {
@@ -34,19 +54,12 @@ exports.getTrackHistory = functions
   var sqlQuery = undefined;
   var after = data.after;
   var before = data.before;
+  var artistSearchQuery = data.artist_search_query;
   if (after !== null) {
-    const query = `
-      SELECT primary_artist AS artist_name, date, name AS song_name, track_id
-      FROM wilt_play_history.play_history
-      WHERE user_id = @user
-      AND UNIX_SECONDS(date) > @after
-      ORDER BY date DESC
-      LIMIT @limit
-    `;
     // The SQL query requires integers so we clamp values as needed
     after = Math.floor(after);
     sqlQuery = {
-      query: query,
+      query: generateQueryString(null, after, artistSearchQuery),
       params: {
         user: user,
         after: after,
@@ -54,18 +67,10 @@ exports.getTrackHistory = functions
       },
     };
   } else if (before !== null) {
-    const query = `
-      SELECT primary_artist AS artist_name, date, name AS song_name, track_id
-      FROM wilt_play_history.play_history
-      WHERE user_id = @user
-      AND UNIX_SECONDS(date) < @before
-      ORDER BY date DESC
-      LIMIT @limit
-    `;
     // The SQL query requires integers so we clamp values as needed
     before = Math.ceil(before);
     sqlQuery = {
-      query: query,
+      query: generateQueryString(before, null, artistSearchQuery),
       params: {
         user: user,
         before: before,
